@@ -12,7 +12,7 @@ export async function tampil(el, ctx) {
   <div class="dalam-krem">
     <header class="bilah-hijau">
       <div class="salam"><small>Khusus Tim Penjawab</small><strong>Pertanyaan Warga</strong></div>
-      <a class="lencana" href="#/dasbor">Dasbor</a>
+      <a class="lencana" href="#/dasbor">Panel</a>
     </header>
     <main class="isi">
       <section class="bagian">

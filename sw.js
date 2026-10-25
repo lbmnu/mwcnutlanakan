@@ -1,7 +1,7 @@
 // Service worker LBM MWCNU Tlanakan.
 // Menyimpan kerangka situs supaya terbuka cepat dan tetap menampilkan halaman saat sinyal hilang.
 // Data (jawaban, kas, absen) tidak pernah disimpan di sini; selalu diambil dari server.
-const VERSI = 'lbm-v2';
+const VERSI = 'lbm-v4';
 const KERANGKA = [
   './',
   './index.html',
@@ -21,6 +21,12 @@ const KERANGKA = [
   './js/views/daftar.js',
   './js/views/menunggu.js',
   './js/views/dasbor.js',
+  './js/views/ruang-warga.js',
+  './js/views/panel-pengurus.js',
+  './js/views/rubrik.js',
+  './js/views/kas.js',
+  './js/views/profil.js',
+  './js/lib/kerangka.js',
   './js/views/gantisandi.js',
   './js/views/jawaban-daftar.js',
   './js/views/jawaban-baca.js',
@@ -71,7 +77,22 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Berkas statis: tampilkan dari cache dulu, perbarui di latar belakang.
+  // Kode situs (js, css, html, manifest): jaringan dulu supaya pembaruan langsung terlihat, cache hanya cadangan saat offline.
+  if (/\.(js|mjs|css|html|webmanifest|json)$/.test(url.pathname)) {
+    e.respondWith((async () => {
+      const cache = await caches.open(VERSI);
+      try {
+        const res = await fetch(req, { cache: 'no-cache' });
+        if (res && res.ok) cache.put(req, res.clone());
+        return res;
+      } catch (_) {
+        return (await cache.match(req)) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // Gambar dan font jarang berubah: dari cache dulu, perbarui di latar belakang.
   e.respondWith((async () => {
     const cache = await caches.open(VERSI);
     const tersimpan = await cache.match(req);

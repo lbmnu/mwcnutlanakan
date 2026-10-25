@@ -11,6 +11,10 @@ import * as jawabanBaca from './views/jawaban-baca.js';
 import * as tanya from './views/tanya.js';
 import * as panelPertanyaan from './views/panel-pertanyaan.js';
 import * as panelJawab from './views/panel-jawab.js';
+import * as ruangWarga from './views/ruang-warga.js';
+import * as rubrik from './views/rubrik.js';
+import * as kas from './views/kas.js';
+import * as profil from './views/profil.js';
 
 const app = document.getElementById('app');
 const JUDUL = 'LBM MWCNU Tlanakan';
@@ -27,6 +31,10 @@ const daftarRute = [
   { pola: /^\/menunggu$/, modul: menunggu, jenis: 'khusus' },
   { pola: /^\/ganti-sandi$/, modul: gantisandi, jenis: 'khusus' },
   { pola: /^\/dasbor$/, modul: dasbor, jenis: 'dalam' },
+  { pola: /^\/beranda$/, modul: ruangWarga, jenis: 'dalam' },
+  { pola: /^\/rubrik$/, modul: rubrik, jenis: 'dalam' },
+  { pola: /^\/kas$/, modul: kas, jenis: 'dalam' },
+  { pola: /^\/profil$/, modul: profil, jenis: 'dalam' },
   { pola: /^\/tanya$/, modul: tanya, jenis: 'dalam' },
   { pola: /^\/panel$/, modul: panelPertanyaan, jenis: 'dalam' },
   { pola: new RegExp(`^/panel/jawab/${UUID}$`), modul: panelJawab, jenis: 'dalam' }

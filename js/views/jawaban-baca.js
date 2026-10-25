@@ -1,4 +1,5 @@
 import { supa } from '../lib/supa.js';
+import { pasangMenu } from '../lib/kerangka.js';
 import { esc, ikon, paragraf, tanggalId, JENIS, salin, tautanJawaban, teksBagikan, tautanWa } from '../lib/util.js';
 
 export async function tampil(el, ctx) {
@@ -13,6 +14,7 @@ export async function tampil(el, ctx) {
   </div>`;
 
   el.innerHTML = kerangka('<div class="bagian"><p class="kosong">Memuat…</p></div>');
+  pasangMenu(el, ctx.state.profil, 'rubrik');
   const isi = () => el.querySelector('main.isi');
 
   if (!ctx.siap) { isi().innerHTML = `<p class="galat">${esc(ctx.alasanBelumSiap)}</p>`; return; }

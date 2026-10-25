@@ -1,4 +1,5 @@
 import { supa } from '../lib/supa.js';
+import { pasangMenu } from '../lib/kerangka.js';
 import { esc, pesanGalat, tanggalId, RUBRIK, STATUS_TANYA } from '../lib/util.js';
 
 const ringkas = (t, n = 120) => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).trimEnd() + '…' : s; };
@@ -8,7 +9,7 @@ export function tampil(el, ctx) {
   <div class="dalam-krem">
     <header class="bilah-hijau">
       <div class="salam"><small>Tim Penjawab LBM</small><strong>Tanya Fikih</strong></div>
-      <a class="lencana" href="#/dasbor">Dasbor</a>
+      <a class="lencana" href="#/profil">Riwayat</a>
     </header>
     <main class="isi">
       <form class="form" id="f" novalidate>
@@ -66,5 +67,6 @@ export function tampil(el, ctx) {
     muatRiwayat();
   });
 
+  pasangMenu(el, ctx.state.profil, 'beranda');
   muatRiwayat();
 }

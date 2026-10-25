@@ -1,22 +1,25 @@
 import { supa } from '../lib/supa.js';
 import { esc, tanggalId, RUBRIK, JENIS } from '../lib/util.js';
+import { pasangMenu } from '../lib/kerangka.js';
 
 const ringkas = (t, n = 150) => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).trimEnd() + '…' : s; };
 
 export function tampil(el, ctx) {
   const masuk = !!ctx.state.session;
+  const awal = new URLSearchParams(location.hash.split('?')[1] || '').get('r') || '';
+  let rubrik = RUBRIK.includes(awal) ? awal : '';
   el.innerHTML = `
   <div class="dalam-krem">
     <header class="bilah-hijau">
       <div class="salam"><small>Terbuka untuk umum</small><strong>Jawaban LBM</strong></div>
-      <a class="lencana" href="${masuk ? '#/dasbor' : '#/'}">${masuk ? 'Dasbor' : 'Beranda'}</a>
+      <a class="lencana" href="${masuk ? '#/dasbor' : '#/'}">${masuk ? 'Beranda' : 'Depan'}</a>
     </header>
     <main class="isi">
       <section class="bagian">
         <h2>Rubrik</h2>
         <div class="chips" role="group" aria-label="Pilih rubrik" id="rubrik">
-          <button type="button" data-r="" aria-pressed="true">Semua</button>
-          ${RUBRIK.map((r) => `<button type="button" data-r="${esc(r)}" aria-pressed="false">${esc(r)}</button>`).join('')}
+          <button type="button" data-r="" aria-pressed="${rubrik === ''}">Semua</button>
+          ${RUBRIK.map((r) => `<button type="button" data-r="${esc(r)}" aria-pressed="${r === rubrik}">${esc(r)}</button>`).join('')}
         </div>
       </section>
       <div id="hasil"><p class="kosong">Memuat…</p></div>
@@ -24,7 +27,6 @@ export function tampil(el, ctx) {
   </div>`;
 
   const hasil = el.querySelector('#hasil');
-  let rubrik = '';
   let nomor = 0;
 
   async function muat() {
@@ -51,5 +53,6 @@ export function tampil(el, ctx) {
     el.querySelectorAll('#rubrik [data-r]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     muat();
   }));
+  pasangMenu(el, ctx.state.profil, 'rubrik');
   muat();
 }
