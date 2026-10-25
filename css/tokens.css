@@ -1,0 +1,22 @@
+/* Token desain LBM MWCNU Tlanakan, mengikuti wireframe yang sudah disetujui.
+   Layar depan (beranda, masuk, daftar): gradasi hijau dan kaca. Layar dalam: latar hijau muda, kartu putih bersudut bulat. */
+:root {
+  --krem: #EEF4F0;         /* latar layar dalam (hijau sangat muda) */
+  --putih: #FFFFFF;        /* kartu */
+  --hijau: #0B3024;        /* area gelap */
+  --hijau-tengah: #0E5238; /* tombol utama di layar dalam */
+  --teks: #12261D;         /* teks utama di layar dalam */
+  --emas: #E3B94B;         /* tombol utama di layar gelap */
+  --emas-muda: #F3D98B;    /* tautan dan aksen di layar gelap */
+  --sage: #DCE9E1;         /* latar tenang, kotak keterangan */
+  --garis: #D5E3DA;        /* garis kartu dan pemisah */
+  --teks-redam: #4A5F55;   /* teks keterangan, 6,0 : 1 di atas latar dalam */
+  --bata: #8A3A2E;         /* pengeluaran dan galat */
+
+  --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-merek: 'Montserrat', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-arab: 'Amiri', 'Traditional Arabic', serif;
+
+  --sentuh: 48px;          /* tinggi minimum area sentuh */
+  --jarak: 16px;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "lbm-mwcnu-tlanakan",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Portal LBM MWCNU Tlanakan (PWA)",
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs",
+    "seed": "node scripts/seed-pengurus.mjs",
+    "start": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "^5.1.0",
+    "@fontsource/montserrat": "^5.1.0",
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
