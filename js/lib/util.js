@@ -16,7 +16,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Pertanyaan tidak ditemukan/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');

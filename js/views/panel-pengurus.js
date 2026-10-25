@@ -1,6 +1,7 @@
 import { supa } from '../lib/supa.js';
 import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
+import { ajakanKode } from '../lib/pemulihan.js';
 import { bisaSetujui } from '../state.js';
 import { esc, ikon, tanggalId } from '../lib/util.js';
 
@@ -18,6 +19,7 @@ export function tampil(el, ctx) {
     judul: p.nama,
     isi: `
       <div id="pasang"></div>
+      <div id="ajakan-kode"></div>
       <div class="tiga-angka" aria-label="Ringkasan">
         <div><b id="st-warga">…</b><small>Warga aktif</small></div>
         <div><b id="st-menunggu">…</b><small>Menunggu persetujuan</small></div>
@@ -45,6 +47,7 @@ export function tampil(el, ctx) {
   });
 
   const bersihPasang = pasangKartu(isi.querySelector('#pasang'));
+  ajakanKode(isi.querySelector('#ajakan-kode'));
   const muatSemua = () => muatAngka(isi, tim);
   muatSemua();
   if (setujui) muatMenunggu(isi.querySelector('#daftar-menunggu'), muatSemua);

@@ -15,6 +15,7 @@ import * as ruangWarga from './views/ruang-warga.js';
 import * as rubrik from './views/rubrik.js';
 import * as kas from './views/kas.js';
 import * as profil from './views/profil.js';
+import * as lupaSandi from './views/lupa-sandi.js';
 
 const app = document.getElementById('app');
 const JUDUL = 'LBM MWCNU Tlanakan';
@@ -26,6 +27,7 @@ const daftarRute = [
   { pola: /^\/$/, modul: beranda, jenis: 'tamu' },
   { pola: /^\/masuk$/, modul: masuk, jenis: 'tamu' },
   { pola: /^\/daftar$/, modul: daftar, jenis: 'tamu' },
+  { pola: /^\/lupa-sandi$/, modul: lupaSandi, jenis: 'tamu' },
   { pola: /^\/jawaban$/, modul: jawabanDaftar, jenis: 'bebas' },
   { pola: new RegExp(`^/jawaban/${UUID}$`), modul: jawabanBaca, jenis: 'bebas' },
   { pola: /^\/menunggu$/, modul: menunggu, jenis: 'khusus' },

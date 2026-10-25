@@ -1,6 +1,6 @@
 import { supa } from './lib/supa.js';
 
-export const state = { session: null, profil: null, galatProfil: null };
+export const state = { session: null, profil: null, galatProfil: null, kodeBaru: null };
 
 export async function muatProfil() {
   state.galatProfil = null;

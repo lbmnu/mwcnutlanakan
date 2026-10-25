@@ -8,7 +8,24 @@ const IK = {
   profil: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   panel: '<path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>'
 };
+Object.assign(IK, {
+  timbangan: '<path d="M12 4v16M6 20h12M5 7h14"/><path d="M7 7l-3 6a3 3 0 0 0 6 0zM17 7l-3 6a3 3 0 0 0 6 0z"/>',
+  tanya: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/>',
+  dokumen: '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>',
+  koin: '<circle cx="12" cy="12" r="9"/><path d="M9 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h5M12 7v2.5M12 15.5V17"/>',
+  orang: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  buku: '<path d="M3 5.5C6 4 9.5 4 12 6c2.5-2 6-2 9-.5V19c-3-1.5-6.5-1.5-9 .5-2.5-2-6-2-9-.5z"/><path d="M12 6v13.5"/>',
+  qr: '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM18 14h2M14 18h2"/>',
+  kode: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/>',
+  masuk: '<path d="M17 7L7 17M7 9v8h8"/>',
+  keluar: '<path d="M7 17L17 7M9 7h8v8"/>',
+  pena: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>'
+});
 const svg = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IK[n]}</svg>`;
+
+export const ikonSvg = svg;
+export const IKON_RUBRIK = { 'Bahtsul Masail': 'timbangan', 'Tanya Fikih': 'tanya', 'Fikih Harian': 'dokumen', 'Fikih Muamalah': 'koin', 'Amaliyah Aswaja': 'orang', 'Kajian Kitab': 'buku' };
+export const ubin = (nama) => `<span class="ubin" aria-hidden="true">${svg(nama)}</span>`;
 
 // Menu bawah. Pengurus: Panel (halaman awal), Beranda, Rubrik, Kas, Profil. Warga: Beranda, Rubrik, Kas, Profil.
 export function menuBawah(profil, aktif) {

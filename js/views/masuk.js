@@ -14,7 +14,7 @@ export function tampil(el, ctx) {
     <form class="kaca form" id="f" style="margin-top:20px" novalidate>
       <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" name="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxxxx" required></div>
       <div class="kolom"><label for="sandi">Kata sandi</label><input id="sandi" name="sandi" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required></div>
-      <p class="petunjuk" style="margin:0;font-size:13px;color:var(--emas-muda);font-weight:600">Lupa kata sandi? Minta reset ke pengurus.</p>
+      <p style="margin:0;font-size:13px;font-weight:600"><a class="tautan-emas" href="#/lupa-sandi" style="min-height:0">Lupa kata sandi?</a></p>
       <p id="pesan" class="galat" role="alert" hidden></p>
       <button class="tombol tombol-emas" type="submit">Masuk</button>
       <p class="teks-kecil-terang">Belum memiliki akun? <a class="tautan-emas" href="#/daftar">Daftar</a></p>

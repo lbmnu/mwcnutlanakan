@@ -1,30 +1,25 @@
-import { layar } from '../lib/kerangka.js';
+import { layar, ubin, IKON_RUBRIK } from '../lib/kerangka.js';
 import { esc, RUBRIK } from '../lib/util.js';
 
 const URAIAN = {
-  'Bahtsul Masail': 'Hasil musyawarah LBM atas persoalan keagamaan.',
+  'Bahtsul Masail': 'Hasil musyawarah dan keputusan bersama.',
   'Tanya Fikih': 'Pertanyaan warga yang dijawab Tim Penjawab.',
-  'Fikih Harian': 'Hukum ibadah dan urusan sehari-hari.',
+  'Fikih Harian': 'Ibadah dan urusan sehari-hari.',
   'Fikih Muamalah': 'Jual beli, utang piutang, dan transaksi.',
-  'Amaliyah Aswaja': 'Tradisi dan amaliyah warga NU.',
-  'Kajian Kitab': 'Telaah ibarat kitab para ulama.'
+  'Amaliyah Aswaja': 'Amalan warga dan dalilnya.',
+  'Kajian Kitab': 'Telaah teks dari kitab rujukan.'
 };
-
-// Huruf awal untuk lencana rubrik, mis. "Fikih Muamalah" -> "FM".
-export const ringkasRubrik = (r) => r.split(/\s+/).map((k) => k[0]).join('').slice(0, 2).toUpperCase();
 
 export function tampil(el, ctx) {
   layar(el, ctx.state.profil, {
     aktif: 'rubrik',
-    kecil: 'Ruang kajian',
+    kecil: 'Pilih ruang yang Anda butuhkan',
     judul: 'Rubrik',
     peran: false,
-    isi: `
-      <section class="bagian"><p class="kosong" style="padding:0">Pilih ruang kajian dan bahtsul masail LBM MWCNU Tlanakan.</p></section>
-      ${RUBRIK.map((r) => `
-        <a class="kartu-tautan kartu-rubrik" href="#/jawaban?r=${encodeURIComponent(r)}">
-          <span class="inisial" aria-hidden="true">${esc(ringkasRubrik(r))}</span>
-          <span class="isi-rubrik"><strong>${esc(r)}</strong><small>${esc(URAIAN[r])}</small></span>
-        </a>`).join('')}`
+    isi: RUBRIK.map((r) => `
+      <a class="kartu-rubrik" href="#/jawaban?r=${encodeURIComponent(r)}">
+        ${ubin(IKON_RUBRIK[r])}
+        <span class="isi-rubrik"><strong>${esc(r)}</strong><small>${esc(URAIAN[r])}</small></span>
+      </a>`).join('')
   });
 }

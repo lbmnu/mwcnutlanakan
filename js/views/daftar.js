@@ -75,7 +75,7 @@ export async function tampil(el, ctx) {
     if (!f.setuju.checked) return tampilkanGalat('Centang persetujuan pencatatan data terlebih dahulu.');
 
     tombol.disabled = true; tombol.textContent = 'Mengirim…';
-    const { error } = await supa.auth.signUp({
+    const { data: hasilDaftar, error } = await supa.auth.signUp({
       email: emailDariWa(wa),
       password: f.sandi.value,
       options: {
@@ -91,6 +91,11 @@ export async function tampil(el, ctx) {
     if (error) {
       tombol.disabled = false; tombol.textContent = 'Kirim Pendaftaran';
       return tampilkanGalat(pesanGalat(error));
+    }
+    // Kode pemulihan dibuat sekarang, ditampilkan sekali di layar berikutnya.
+    if (hasilDaftar?.session) {
+      const { data: kode } = await supa.rpc('buat_kode_pemulihan');
+      if (kode) ctx.state.kodeBaru = kode;
     }
     // Bila konfirmasi email dimatikan (sesuai README), sesi langsung aktif dan layar "menunggu" tampil.
     await ctx.segarkan();

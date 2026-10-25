@@ -1,6 +1,8 @@
 /* Token desain LBM MWCNU Tlanakan, mengikuti wireframe yang sudah disetujui.
    Layar depan (beranda, masuk, daftar): gradasi hijau dan kaca. Layar dalam: latar hijau muda, kartu putih bersudut bulat. */
 :root {
+  --emas-pucat: #FBF0D0;
+  --biru-pucat: #E4EDF5;
   --krem: #EEF4F0;         /* latar layar dalam (hijau sangat muda) */
   --putih: #FFFFFF;        /* kartu */
   --hijau: #0B3024;        /* area gelap */

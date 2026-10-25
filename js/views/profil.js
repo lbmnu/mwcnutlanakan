@@ -1,6 +1,7 @@
 import { supa } from '../lib/supa.js';
 import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
+import { kotakKode, pasangSalin, statusKode, teksStatus } from '../lib/pemulihan.js';
 import { adalahPengurus } from '../state.js';
 import { esc, tanggalId, STATUS_TANYA } from '../lib/util.js';
 
@@ -15,7 +16,13 @@ export function tampil(el, ctx) {
     kanan: `<span class="lencana lencana-isi">${adalahPengurus(p) ? 'Pengurus Aktif' : 'Warga Aktif'}</span>`,
     isi: `
       <div id="pasang"></div>
-      ${segeraHadir('Tingkat Partisipasi', 'Hanya Anda yang akan melihat statistik ini.')}
+      <section class="bagian kartu-ring segera" aria-label="Tingkat Partisipasi">
+        <div class="ring kosong-ring" aria-hidden="true"><div><b>–</b>dari 100</div></div>
+        <div class="batang-ring">
+          <div class="baris-judul"><h2>Tingkat Partisipasi</h2><span class="tag tag-garis">Segera hadir</span></div>
+          <small>Hanya Anda yang akan melihat statistik ini.</small>
+        </div>
+      </section>
       <section class="bagian">
         <div class="baris-judul"><h2>Riwayat Pertanyaan</h2><a class="tautan-hijau" href="#/tanya">Tanya baru</a></div>
         <div id="riwayat"><p class="kosong">Memuat…</p></div>
@@ -26,12 +33,19 @@ export function tampil(el, ctx) {
         <div class="rincian"><span>Nomor WhatsApp</span><b>+${esc(p.wa)}</b></div>
         ${p.ranting?.nama ? `<div class="rincian"><span>Ranting</span><b>NU ${esc(p.ranting.nama)}</b></div>` : ''}
       </section>
+      <section class="bagian" id="kode-pemulihan">
+        <h2>Kode Pemulihan</h2>
+        <p class="kosong" id="status-kode">Memuat…</p>
+        <div id="hasil-kode"></div>
+        <button type="button" class="tombol tombol-garis" id="buat-kode" style="margin-top:12px;color:var(--hijau-tengah)" hidden>Buat kode baru</button>
+      </section>
       <button type="button" class="tombol tombol-garis" id="keluar">Keluar</button>`
   });
 
   const bersihPasang = pasangKartu(isi.querySelector('#pasang'));
   isi.querySelector('#keluar').addEventListener('click', async () => { await supa.auth.signOut(); location.hash = '#/'; ctx.segarkan(); });
   muatRiwayat(isi.querySelector('#riwayat'));
+  kodePemulihan(isi);
   return bersihPasang;
 }
 
@@ -48,4 +62,26 @@ async function muatRiwayat(kotak) {
         ${q.jawaban_id ? `<a class="tautan-hijau" href="#/jawaban/${esc(q.jawaban_id)}">Baca jawaban</a>` : ''}
       </div>
     </div>`).join('');
+}
+
+async function kodePemulihan(isi) {
+  const status = isi.querySelector('#status-kode');
+  const tombol = isi.querySelector('#buat-kode');
+  const hasil = isi.querySelector('#hasil-kode');
+  const s = await statusKode();
+  if (s === undefined) { status.textContent = 'Status kode belum bisa dimuat.'; return; }
+  status.textContent = 'Kode ini dipakai bila Anda lupa kata sandi. ' + (s ? '' : 'Anda belum punya kode. ') + teksStatus(s);
+  tombol.hidden = false;
+  tombol.textContent = s ? 'Buat kode baru' : 'Buat kode pemulihan';
+  tombol.addEventListener('click', async () => {
+    if (s && !confirm('Kode lama tidak akan berlaku lagi. Lanjutkan?')) return;
+    tombol.disabled = true;
+    const { data, error } = await supa.rpc('buat_kode_pemulihan');
+    tombol.disabled = false;
+    if (error || !data) { hasil.innerHTML = '<p class="galat">Kode belum bisa dibuat. Coba lagi nanti.</p>'; return; }
+    hasil.innerHTML = kotakKode(data);
+    pasangSalin(hasil);
+    status.textContent = 'Kode baru sudah dibuat. Simpan sekarang.';
+    tombol.hidden = true;
+  });
 }
