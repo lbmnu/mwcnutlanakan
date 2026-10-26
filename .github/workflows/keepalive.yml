@@ -1,0 +1,21 @@
+# Menjaga proyek Supabase (paket gratis) tidak dijeda saat sepi pengunjung.
+# Tiap 3 hari membaca satu baris dari tampilan publik "jawaban_publik".
+name: Jaga Supabase tetap aktif
+
+on:
+  schedule:
+    - cron: '17 2 */3 * *'   # 02:17 UTC, tiap 3 hari
+  workflow_dispatch: {}       # boleh dijalankan manual dari tab Actions
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hubungi Supabase
+        run: |
+          curl --fail --silent --show-error --max-time 30 \
+            "https://xyxsyyqzlkzeqihrpjdk.supabase.co/rest/v1/jawaban_publik?select=id&limit=1" \
+            -H "apikey: sb_publishable_CIK8FeePerWSQSqu0Y9Nqg_djH4XZqL" \
+            -o /dev/null -w "Supabase menjawab: HTTP %{http_code}\n"
