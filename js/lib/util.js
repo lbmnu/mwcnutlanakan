@@ -16,7 +16,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');
@@ -86,4 +86,12 @@ export async function salin(teks) {
     document.body.appendChild(t); t.select();
     const ok = document.execCommand('copy'); t.remove(); return ok;
   } catch (_) { return false; }
+}
+
+// ---------- Rupiah dan tanggal WIB ----------
+export const rp = (n) => `Rp ${Math.abs(Number(n) || 0).toLocaleString('id-ID')}`;
+export const rpTanda = (n) => `${Number(n) < 0 ? '−' : ''}${rp(n)}`;
+// Tanggal hari ini menurut WIB, bentuk "2026-10-26" (cocok untuk <input type=date>).
+export function hariIniWib() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 }

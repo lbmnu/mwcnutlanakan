@@ -370,3 +370,28 @@ button { cursor: pointer; }
 .majelis { position: fixed; inset: 0; z-index: 20; overflow: auto; }
 .batang.bisa-buka { cursor: pointer; min-height: 40px; }
 .belum-hadir { margin: 2px 0 8px; padding: 4px 12px; background: #F3F8F5; border-radius: 14px; }
+
+/* ---------- Kas (tahap 4) ---------- */
+.form-kas { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.form-kas[hidden] { display: none; }
+.form-kas .kolom input[type=date] { min-height: 48px; border-radius: 14px; border: 1px solid #B9CFC2; background: var(--putih); color: var(--teks); padding: 0 14px; font: inherit; }
+.petunjuk-kas { font-size: 12px; line-height: 1.5; color: var(--teks-redam); margin: 0; }
+.transaksi.batal { opacity: .6; }
+.transaksi.batal b { text-decoration: line-through; }
+.transaksi > b { font-size: 14px; white-space: nowrap; align-self: flex-start; margin-top: 2px; }
+.transaksi .alasan-batal { color: var(--bata); font-weight: 600; }
+.transaksi .pencatat { opacity: .85; }
+.tautan-bata { color: var(--bata); font-weight: 700; font-size: 12px; min-height: 36px; padding: 0; }
+.form-batal { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.form-batal[hidden] { display: none; }
+.form-batal input { min-height: 44px; border-radius: 12px; border: 1px solid #B9CFC2; padding: 0 12px; font: inherit; background: var(--putih); color: var(--teks); }
+.baris-tombol { display: flex; gap: 8px; flex-wrap: wrap; }
+.rekap-baris { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 8px 10px; border: 0; border-top: 1px solid #E3ECE6; background: transparent; text-align: left; font: inherit; font-size: 13px; color: var(--teks); border-radius: 10px; }
+.rekap-baris:first-child { border-top: 0; }
+.rekap-baris[aria-pressed=true] { background: var(--sage); }
+.rekap-baris span { font-weight: 700; }
+.kas-mini { display: flex; flex-direction: column; gap: 2px; margin: 8px 0 4px; }
+.kas-mini b { font-size: 24px; font-weight: 800; color: var(--hijau-tengah); }
+.kas-mini small { color: var(--teks-redam); font-size: 12px; }
+.transaksi small { display: block; }
+.transaksi .tautan-bata { display: block; text-align: left; }

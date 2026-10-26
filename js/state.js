@@ -14,6 +14,10 @@ export async function muatProfil() {
   state.profil = data; // null bila trigger pendaftaran belum membuat baris profil
 }
 
+// Pencatat kas: Bendahara, Ketua, Wakil Ketua, admin (sama dengan fungsi database bisa_kas).
+export const bisaKas = (p) =>
+  !!p && p.status === 'aktif' && (p.peran === 'admin' || ['ketua', 'wakil_ketua', 'bendahara'].includes(p.jabatan_lbm));
+
 export const bisaSetujui = (p) =>
   !!p && p.status === 'aktif' && (p.peran === 'admin' || ['ketua', 'wakil_ketua', 'sekretaris'].includes(p.jabatan_lbm));
 

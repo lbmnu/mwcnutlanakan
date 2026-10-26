@@ -2,8 +2,8 @@ import { supa } from '../lib/supa.js';
 import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
-import { bisaSetujui } from '../state.js';
-import { esc, ikon, tanggalId, pesanGalat } from '../lib/util.js';
+import { bisaSetujui, bisaKas } from '../state.js';
+import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda } from '../lib/util.js';
 import { sesiAktif, judulSesi } from '../lib/absen.js';
 
 const namaTipe = (t) => (t === 'pengurus_struktural' ? 'Pengurus Struktural' : 'Warga NU');
@@ -27,6 +27,7 @@ export function tampil(el, ctx) {
         <div><b id="st-tanya">${tim ? '…' : '–'}</b><small>Pertanyaan belum dijawab</small></div>
       </div>
       <section class="bagian" id="sesi-absen"><p class="kosong">Memuat…</p></section>
+      <section class="bagian" id="kas-ringkas"><p class="kosong">Memuat…</p></section>
       <section class="bagian">
         <div class="baris-judul"><h2>Menunggu Persetujuan</h2><span class="tag" id="lencana-menunggu">…</span></div>
         ${setujui ? '<div id="daftar-menunggu"><p class="kosong">Memuat…</p></div>' : '<p class="kosong">Persetujuan pendaftar dilakukan oleh Ketua, Wakil Ketua, Sekretaris, atau admin.</p>'}
@@ -58,6 +59,7 @@ export function tampil(el, ctx) {
   ajakanKode(isi.querySelector('#ajakan-kode'));
   const muatSemua = () => muatAngka(isi, tim);
   muatSemua();
+  muatKasRingkas(isi, bisaKas(p));
   if (setujui) muatMenunggu(isi.querySelector('#daftar-menunggu'), muatSemua);
   if (setujui) bantuSandi(isi.querySelector('#bantu-sandi'), p);
   if (tim) muatAntrean(isi.querySelector('#antrean'));
@@ -301,4 +303,16 @@ async function bantuSandi(kotak, saya) {
         <small>Tampil sekali ini saja. Kirim lewat WA pribadi, bukan grup.</small></div>
       <div class="aksi"><a class="tombol tombol-hijau tombol-kecil" href="https://wa.me/${esc(wa)}?text=${encodeURIComponent(pesan)}">${ikon('wa')} Kirim WA</a></div>`;
   });
+}
+
+// Kartu kas di Panel: saldo dan arus bulan ini; rinciannya ada di menu Kas.
+async function muatKasRingkas(isi, boleh) {
+  const k = isi.querySelector('#kas-ringkas');
+  const { data, error } = await supa.rpc('kas_ringkasan');
+  const r = data?.[0];
+  if (error || !r) { k.innerHTML = '<div class="baris-judul"><h2>Kas LBM</h2></div><p class="kosong">Belum bisa dimuat.</p>'; return; }
+  k.innerHTML = `
+    <div class="baris-judul"><h2>Kas LBM</h2><a class="tautan-hijau" href="#/kas">${boleh ? 'Catat / rincian' : 'Rincian'}</a></div>
+    <div class="kas-mini"><b>${esc(rpTanda(r.saldo))}</b><small>Saldo kas saat ini</small></div>
+    <p class="kosong">Bulan ini: masuk ${esc(rp(r.masuk_bulan))}, keluar ${esc(rp(r.keluar_bulan))}.</p>`;
 }
