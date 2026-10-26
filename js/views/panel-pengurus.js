@@ -3,7 +3,7 @@ import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
 import { bisaSetujui } from '../state.js';
-import { esc, ikon, tanggalId } from '../lib/util.js';
+import { esc, ikon, tanggalId, pesanGalat } from '../lib/util.js';
 
 const namaTipe = (t) => (t === 'pengurus_struktural' ? 'Pengurus Struktural' : 'Warga NU');
 const ringkas = (t, n = 110) => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).trimEnd() + '…' : s; };
@@ -30,6 +30,13 @@ export function tampil(el, ctx) {
         <div class="baris-judul"><h2>Menunggu Persetujuan</h2><span class="tag" id="lencana-menunggu">…</span></div>
         ${setujui ? '<div id="daftar-menunggu"><p class="kosong">Memuat…</p></div>' : '<p class="kosong">Persetujuan pendaftar dilakukan oleh Ketua, Wakil Ketua, Sekretaris, atau admin.</p>'}
       </section>
+      ${setujui ? `
+      <section class="bagian" id="bantu-sandi">
+        <h2>Bantu Warga Lupa Sandi</h2>
+        <p class="kosong">Untuk warga yang lupa sandi dan belum punya kode pemulihan. Cari namanya, lalu buat kata sandi sementara dan kirim lewat WA.</p>
+        <div class="kolom" style="margin-top:10px"><label for="cari-warga" class="judul-kolom">Cari nama atau nomor WA</label><input id="cari-warga" type="text" autocomplete="off" placeholder="Ketik minimal 2 huruf"></div>
+        <div id="hasil-cari"></div>
+      </section>` : ''}
       ${tim ? `
       <section class="bagian">
         <div class="baris-judul"><h2>Antrean Pertanyaan</h2><a class="tautan-hijau" href="#/panel">Buka semua</a></div>
@@ -51,6 +58,7 @@ export function tampil(el, ctx) {
   const muatSemua = () => muatAngka(isi, tim);
   muatSemua();
   if (setujui) muatMenunggu(isi.querySelector('#daftar-menunggu'), muatSemua);
+  if (setujui) bantuSandi(isi.querySelector('#bantu-sandi'), p);
   if (tim) muatAntrean(isi.querySelector('#antrean'));
   muatStruktur(isi.querySelector('#struktur'));
   muatRanting(isi);
@@ -180,4 +188,53 @@ async function muatRanting(isi) {
   tombol.hidden = baris.length <= 5;
   tombol.addEventListener('click', () => { semua = !semua; gambar(); });
   gambar();
+}
+
+// Pengurus penyetuju membantu warga yang lupa sandi: sandi sementara dibuat server, tampil sekali.
+async function bantuSandi(kotak, saya) {
+  const cari = kotak.querySelector('#cari-warga');
+  const hasil = kotak.querySelector('#hasil-cari');
+  let semua = null;
+  let nomor = 0;
+
+  async function muat() {
+    if (semua) return semua;
+    const { data, error } = await supa.from('profil').select('id,nama,wa,peran,ranting(nama)').eq('status', 'aktif').order('nama', { ascending: true });
+    if (error) return null;
+    semua = data.filter((x) => x.id !== saya.id && (x.peran !== 'admin' || saya.peran === 'admin'));
+    return semua;
+  }
+
+  cari.addEventListener('input', async () => {
+    const saya_ = ++nomor;
+    const q = cari.value.trim().toLowerCase().replace(/^\+/, '');
+    if (q.length < 2) { hasil.innerHTML = ''; return; }
+    const data = await muat();
+    if (saya_ !== nomor) return;
+    if (!data) { hasil.innerHTML = '<p class="galat">Daftar warga belum bisa dimuat.</p>'; return; }
+    const cocok = data.filter((x) => x.nama.toLowerCase().includes(q) || x.wa.includes(q.replace(/^0/, '62'))).slice(0, 6);
+    if (!cocok.length) { hasil.innerHTML = '<p class="kosong">Tidak ada akun aktif yang cocok.</p>'; return; }
+    hasil.innerHTML = cocok.map((x) => `
+      <div class="baris" data-id="${esc(x.id)}" data-nama="${esc(x.nama)}" data-wa="${esc(x.wa)}">
+        <div class="teks"><strong>${esc(x.nama)}</strong><small>${x.ranting?.nama ? 'Ranting NU ' + esc(x.ranting.nama) + ' · ' : ''}+${esc(x.wa)}</small></div>
+        <div class="aksi"><button type="button" class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" data-setel>Setel ulang</button></div>
+      </div>`).join('');
+  });
+
+  hasil.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-setel]');
+    if (!b) return;
+    const baris = b.closest('.baris');
+    const { id, nama, wa } = baris.dataset;
+    if (!confirm(`Setel ulang kata sandi ${nama}? Sandi lamanya langsung tidak berlaku.`)) return;
+    b.disabled = true;
+    const { data, error } = await supa.rpc('setel_ulang_sandi_warga', { p_id: id });
+    if (error || !data) { b.disabled = false; alert(error ? pesanGalat(error) : 'Belum berhasil. Coba lagi.'); return; }
+    const pesan = `Assalamu’alaikum Wr. Wb. Bapak/Ibu ${nama}, kata sandi sementara Anda di website LBM MWCNU Tlanakan: ${data}\n\nSilakan masuk dengan nomor WhatsApp ini, lalu buat kata sandi baru. Jangan dibagikan kepada siapa pun. Wassalamu’alaikum Wr. Wb.`;
+    baris.innerHTML = `
+      <div class="teks"><strong>Sandi sementara ${esc(nama)}</strong>
+        <span class="kode-huruf" style="text-align:left;font-size:22px" id="sandi-sementara">${esc(data)}</span>
+        <small>Tampil sekali ini saja. Kirim lewat WA pribadi, bukan grup.</small></div>
+      <div class="aksi"><a class="tombol tombol-hijau tombol-kecil" href="https://wa.me/${esc(wa)}?text=${encodeURIComponent(pesan)}">${ikon('wa')} Kirim WA</a></div>`;
+  });
 }
