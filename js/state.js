@@ -22,6 +22,8 @@ export const bisaKas = (p) =>
 export const adalahPenyunting = (p) =>
   !!p && p.status === 'aktif' && (p.tim_penyunting === true || p.peran === 'admin' || ['ketua', 'wakil_ketua'].includes(p.jabatan_lbm));
 
+export const adalahAdmin = (p) => !!p && p.status === 'aktif' && p.peran === 'admin';
+
 export const bisaSetujui = (p) =>
   !!p && p.status === 'aktif' && (p.peran === 'admin' || ['ketua', 'wakil_ketua', 'sekretaris'].includes(p.jabatan_lbm));
 

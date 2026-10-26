@@ -7,6 +7,7 @@ const ringkas = (t, n = 150) => { const s = String(t || '').replace(/\s+/g, ' ')
 export function tampil(el, ctx) {
   const masuk = !!ctx.state.session;
   let bentuk = '';
+  if (masuk) { location.replace('#/pustaka?t=tulisan'); return; }
   el.innerHTML = `
   <div class="dalam-krem">
     <header class="bilah-hijau">

@@ -27,7 +27,7 @@ export const ikonSvg = svg;
 export const IKON_RUBRIK = { 'Bahtsul Masail': 'timbangan', 'Tanya Fikih': 'tanya', 'Fikih Harian': 'dokumen', 'Fikih Muamalah': 'koin', 'Amaliyah Aswaja': 'orang', 'Kajian Kitab': 'buku' };
 export const ubin = (nama) => `<span class="ubin" aria-hidden="true">${svg(nama)}</span>`;
 
-// Menu bawah. Pengurus: Panel (halaman awal), Beranda, Rubrik, Kas, Profil. Warga: Beranda, Rubrik, Kas, Profil.
+// Menu bawah. Pengurus: Panel (halaman awal), Beranda, Pustaka, Kas, Profil. Warga: Beranda, Pustaka, Kas, Profil.
 export function menuBawah(profil, aktif) {
   const item = (kunci, href, teks, ikonKunci) =>
     `<a href="${href}" class="${aktif === kunci ? 'on' : ''}"${aktif === kunci ? ' aria-current="page"' : ''}>${svg(ikonKunci)}<span>${teks}</span></a>`;
@@ -35,7 +35,7 @@ export function menuBawah(profil, aktif) {
   return `<nav class="nav-bawah" aria-label="Menu utama">
     ${p ? item('panel', '#/dasbor', 'Panel', 'panel') : ''}
     ${item('beranda', p ? '#/beranda' : '#/dasbor', 'Beranda', 'beranda')}
-    ${item('rubrik', '#/rubrik', 'Rubrik', 'rubrik')}
+    ${item('rubrik', '#/pustaka', 'Pustaka', 'rubrik')}
     ${item('kas', '#/kas', 'Kas', 'kas')}
     ${item('profil', '#/profil', 'Profil', 'profil')}
   </nav>`;

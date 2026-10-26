@@ -1,8 +1,8 @@
 import { pasangKartu } from '../lib/pasang.js';
-import { layar, ubin, IKON_RUBRIK } from '../lib/kerangka.js';
+import { layar, ubin } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
-import { esc, tanggalId, RUBRIK, JENIS } from '../lib/util.js';
-import { jawabanTerbaru } from '../lib/data.js';
+import { esc, tanggalId, JENIS } from '../lib/util.js';
+import { jawabanTerbaru, tulisanTerbaru } from '../lib/data.js';
 import { pasangKartuAbsen } from '../lib/kartu-absen.js';
 import { pasangRingHadir } from '../lib/ring-hadir.js';
 
@@ -19,10 +19,7 @@ export function tampil(el, ctx) {
       <section class="bagian kartu-ring" id="ring-hadir" aria-label="Kehadiran rutinan"><p class="kosong">Memuat…</p></section>
       <section class="bagian kartu-gelap" id="terbaru"><p class="kosong">Memuat…</p></section>
       <section class="bagian" id="kartu-absen"></section>
-      <div class="baris-judul judul-luar"><h2>Rubrik</h2><a class="tautan-hijau" href="#/rubrik">Lihat semua</a></div>
-      <div class="kisi-rubrik">
-        ${RUBRIK.map((r) => `<a href="#/jawaban?r=${encodeURIComponent(r)}">${ubin(IKON_RUBRIK[r])}${esc(r)}</a>`).join('')}
-      </div>
+      <section class="bagian" id="tulisan-terbaru"><p class="kosong">Memuat…</p></section>
       <section class="bagian">
         <h2>Kirim Pertanyaan</h2>
         <p class="kosong">Tulis persoalan fikih harian, muamalah, atau amaliyah yang ingin dijawab LBM. Jawaban terbit tanpa menyebut nama dan ranting Anda.</p>
@@ -48,6 +45,7 @@ export function tampil(el, ctx) {
   const bersihPasang = pasangKartu(isi.querySelector('#pasang'));
   ajakanKode(isi.querySelector('#ajakan-kode'));
   muatTerbaru(isi.querySelector('#terbaru'));
+  muatTulisanTerbaru(isi.querySelector('#tulisan-terbaru'));
   const ring = () => pasangRingHadir(isi.querySelector('#ring-hadir'));
   pasangKartuAbsen(isi.querySelector('#kartu-absen'), ring);
   ring();
@@ -64,4 +62,16 @@ async function muatTerbaru(kotak) {
       <small>${esc(JENIS[j.jenis] || '')} · ${esc(tanggalId(j.diterbitkan_pada))}</small>
     </div>
     <a class="tombol tombol-emas tombol-kecil" href="#/jawaban/${esc(j.id)}">Baca</a>`;
+}
+
+async function muatTulisanTerbaru(kotak) {
+  const [t] = await tulisanTerbaru(1);
+  kotak.innerHTML = t
+    ? `<div class="baris-judul"><h2>Tulisan Terbaru</h2><a class="tautan-hijau" href="#/pustaka">Buka Pustaka</a></div>
+       <a class="kartu-tautan kartu-dalam" href="#/tulisan/${esc(t.id)}">
+         <span class="tag-baris"><span class="tag">${esc(t.bentuk)}</span></span>
+         <strong>${esc(t.judul)}</strong>
+         <small>${t.penulis ? esc(t.penulis) + ' · ' : ''}Terbit ${esc(tanggalId(t.diterbitkan_pada))}</small>
+       </a>`
+    : '<div class="baris-judul"><h2>Pustaka</h2><a class="tautan-hijau" href="#/pustaka">Buka</a></div><p class="kosong">Baca jawaban LBM dan tulisan warga di Pustaka.</p>';
 }

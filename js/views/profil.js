@@ -61,6 +61,7 @@ async function muatRiwayat(kotak) {
         <strong class="isi-ringkas">${esc(ringkas(q.isi))}</strong>
         <small>${q.status === 'terjawab' && q.diterbitkan_pada ? `Terbit ${esc(tanggalId(q.diterbitkan_pada))}` : `Dikirim ${esc(tanggalId(q.dibuat_pada))}`}</small>
         ${q.jawaban_id ? `<a class="tautan-hijau" href="#/jawaban/${esc(q.jawaban_id)}">Baca jawaban</a>` : ''}
+        ${q.status === 'ditolak' && q.alasan_tolak ? `<span class="catatan-sunting"><b>Alasan penolakan</b><span style="display:block">${esc(q.alasan_tolak)}</span></span>` : ''}
       </div>
     </div>`).join('');
 }

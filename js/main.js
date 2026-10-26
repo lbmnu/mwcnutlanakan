@@ -12,7 +12,7 @@ import * as tanya from './views/tanya.js';
 import * as panelPertanyaan from './views/panel-pertanyaan.js';
 import * as panelJawab from './views/panel-jawab.js';
 import * as ruangWarga from './views/ruang-warga.js';
-import * as rubrik from './views/rubrik.js';
+import * as pustaka from './views/pustaka.js';
 import * as kas from './views/kas.js';
 import * as profil from './views/profil.js';
 import * as lupaSandi from './views/lupa-sandi.js';
@@ -48,7 +48,7 @@ const daftarRute = [
   { pola: /^\/ganti-sandi$/, modul: gantisandi, jenis: 'khusus' },
   { pola: /^\/dasbor$/, modul: dasbor, jenis: 'dalam' },
   { pola: /^\/beranda$/, modul: ruangWarga, jenis: 'dalam' },
-  { pola: /^\/rubrik$/, modul: rubrik, jenis: 'dalam' },
+  { pola: /^\/(pustaka|rubrik)$/, modul: pustaka, jenis: 'dalam' },
   { pola: /^\/kas$/, modul: kas, jenis: 'dalam' },
   { pola: /^\/profil$/, modul: profil, jenis: 'dalam' },
   { pola: /^\/absen$/, modul: absen, jenis: 'dalam' },

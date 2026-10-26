@@ -159,7 +159,7 @@ button { cursor: pointer; }
 .status-menunggu, .status-baru { background: var(--sage); color: #1B3A2C; }
 .status-ditelaah { background: #FBF0D0; color: #5C4510; }
 .status-terjawab { background: #D3EBDC; color: #0B3B2C; }
-.status-lama { background: #F7E4E0; color: var(--bata); }
+.status-lama, .status-ditolak { background: #F7E4E0; color: var(--bata); }
 .judul-baca { margin: 10px 0 6px; font-size: 22px; line-height: 1.3; font-weight: 800; text-wrap: balance; }
 .meta { margin: 0; font-size: 12px; color: var(--teks-redam); }
 .teks-baca p { margin: 8px 0 0; font-size: 16px; line-height: 1.75; }
@@ -410,3 +410,4 @@ button { cursor: pointer; }
 .judul-mini { font-weight: 700; margin: 6px 0; }
 @media (min-width: 720px) { .dua-versi { grid-template-columns: 1fr 1fr; } }
 .kartu-tulisan h2 { margin: 0 0 4px; }
+.kartu-dalam { border: 0; box-shadow: none; padding: 0; margin-top: 8px; }

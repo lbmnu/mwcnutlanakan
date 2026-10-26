@@ -23,6 +23,15 @@ export function tampil(el, ctx) {
   const isi = el.querySelector('#m-isi');
   el.querySelector('#m-penuh').addEventListener('click', () => { (el.requestFullscreen || (() => {})).call(el); });
 
+  // Menahan layar agar tidak mati selama acara (didukung Chrome/Edge/Safari baru; yang lain diabaikan).
+  let kunciLayar = null;
+  async function tahanLayar() {
+    try { if (hidup && document.visibilityState === 'visible' && navigator.wakeLock) kunciLayar = await navigator.wakeLock.request('screen'); } catch (_) {}
+  }
+  const saatTampak = () => { if (document.visibilityState === 'visible') tahanLayar(); };
+  document.addEventListener('visibilitychange', saatTampak);
+  tahanLayar();
+
   async function ambilKode() {
     if (sedangAmbil || !hidup) return; sedangAmbil = true;
     const { data, error } = await supa.rpc('kode_sesi', { p_id: sesi.id });
@@ -69,5 +78,9 @@ export function tampil(el, ctx) {
     }, 1000);
     timerHadir = setInterval(muatHadir, 8000);
   })();
-  return () => { hidup = false; clearInterval(timerDetik); clearInterval(timerHadir); };
+  return () => {
+    hidup = false; clearInterval(timerDetik); clearInterval(timerHadir);
+    document.removeEventListener('visibilitychange', saatTampak);
+    try { kunciLayar?.release(); } catch (_) {}
+  };
 }

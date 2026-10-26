@@ -10,3 +10,14 @@ export async function jawabanTerbaru(n = 1) {
     .limit(n);
   return error ? [] : data;
 }
+
+// Tulisan terbit terbaru (tampilan publik "tulisan_publik").
+export async function tulisanTerbaru(n = 1) {
+  if (!supa) return [];
+  const { data, error } = await supa
+    .from('tulisan_publik')
+    .select('id,bentuk,judul,penulis,ranting,diterbitkan_pada')
+    .order('diterbitkan_pada', { ascending: false })
+    .limit(n);
+  return error ? [] : data;
+}

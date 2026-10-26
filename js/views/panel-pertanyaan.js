@@ -20,6 +20,7 @@ export async function tampil(el, ctx) {
           <button type="button" role="tab" data-t="belum" aria-selected="true">Belum Dijawab <b id="n-belum">0</b></button>
           <button type="button" role="tab" data-t="draf" aria-selected="false">Draf <b id="n-draf">0</b></button>
           <button type="button" role="tab" data-t="terbit" aria-selected="false">Terbit <b id="n-terbit">0</b></button>
+          <button type="button" role="tab" data-t="ditolak" aria-selected="false">Ditolak <b id="n-ditolak">0</b></button>
         </div>
       </section>
       <div id="hasil"><p class="kosong">Memuat…</p></div>
@@ -27,13 +28,13 @@ export async function tampil(el, ctx) {
   </div>`;
 
   const hasil = el.querySelector('#hasil');
-  let semua = { belum: [], draf: [], terbit: [] };
+  let semua = { belum: [], draf: [], terbit: [], ditolak: [] };
   let tab = 'belum';
 
   function gambarDaftar() {
     const isi = semua[tab];
     if (!isi.length) {
-      const t = { belum: 'Tidak ada pertanyaan yang menunggu.', draf: 'Belum ada draf jawaban.', terbit: 'Belum ada jawaban yang terbit.' }[tab];
+      const t = { belum: 'Tidak ada pertanyaan yang menunggu.', draf: 'Belum ada draf jawaban.', terbit: 'Belum ada jawaban yang terbit.', ditolak: 'Belum ada pertanyaan yang ditolak.' }[tab];
       hasil.innerHTML = `<div class="bagian"><p class="kosong">${t}</p></div>`;
       return;
     }
@@ -66,12 +67,13 @@ export async function tampil(el, ctx) {
   const jawabanDari = new Map(rj.data.map((j) => [j.pertanyaan_id, j]));
   for (const q of rq.data) {
     const j = jawabanDari.get(q.id);
-    if (j?.status === 'terbit') semua.terbit.push({ q, j });
+    if (q.status === 'ditolak') semua.ditolak.push({ q, j });
+    else if (j?.status === 'terbit') semua.terbit.push({ q, j });
     else if (j) semua.draf.push({ q, j });
     else semua.belum.push({ q, j });
   }
   semua.terbit.sort((a, b) => new Date(b.j.diterbitkan_pada) - new Date(a.j.diterbitkan_pada));
-  for (const k of ['belum', 'draf', 'terbit']) el.querySelector(`#n-${k}`).textContent = String(semua[k].length);
+  for (const k of ['belum', 'draf', 'terbit', 'ditolak']) el.querySelector(`#n-${k}`).textContent = String(semua[k].length);
 
   el.querySelectorAll('#tab [data-t]').forEach((b) => b.addEventListener('click', () => {
     tab = b.dataset.t;

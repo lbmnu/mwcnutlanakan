@@ -1,4 +1,5 @@
 import { supa } from '../lib/supa.js';
+import { adalahAdmin } from '../state.js';
 import { esc, ikon, pesanGalat, tanggalId, salin, tautanJawaban, teksBagikan, tautanWa, RUBRIK } from '../lib/util.js';
 
 export async function tampil(el, ctx) {
@@ -18,7 +19,7 @@ export async function tampil(el, ctx) {
 
   const [rq, rj, rt] = await Promise.all([
     supa.from('pertanyaan')
-      .select('id,rubrik,isi,status,dibuat_pada,penanya:profil!penanya_id(nama,wa,ranting(nama)),penangan:profil!ditangani_oleh(nama)')
+      .select('id,rubrik,isi,status,alasan_tolak,dibuat_pada,penanya:profil!penanya_id(nama,wa,ranting(nama)),penangan:profil!ditangani_oleh(nama)')
       .eq('id', id).maybeSingle(),
     supa.from('jawaban').select('*').eq('pertanyaan_id', id).maybeSingle(),
     supa.from('profil').select('id,nama').eq('status', 'aktif').eq('tim_penjawab', true).neq('id', saya.id).order('nama')
@@ -31,6 +32,7 @@ export async function tampil(el, ctx) {
   const nama = (uid) => (uid === saya.id ? 'Anda' : rekan.find((r) => r.id === uid)?.nama || 'anggota Tim');
 
   function gambar() {
+    if (q.status === 'ditolak') { gambarDitolak(); return; }
     const terbit = j?.status === 'terbit';
     const peninjau = j?.minta_tinjauan_id || '';
     const sayaPeninjau = peninjau === saya.id;
@@ -76,8 +78,10 @@ export async function tampil(el, ctx) {
         </div>
         ${terbit ? '' : '<p class="catatan">Setelah terbit, jawaban terbuka untuk umum dan tampil sebagai jawaban terbaru. Status di riwayat penanya berubah menjadi Terjawab.</p>'}
       </form>
-      ${terbit ? panelBagikan() : ''}`;
+      ${terbit ? panelBagikan() : ''}
+      ${panelTindakan(terbit)}`;
     pasang();
+    pasangTindakan();
   }
 
   function panelBagikan() {
@@ -168,6 +172,80 @@ export async function tampil(el, ctx) {
       const ok = await salin(teksBagikan({ id: j.id, judul: j.judul, jenis: j.jenis }));
       salinTeks.querySelector('span').textContent = ok ? 'Teks tersalin' : 'Salin manual dari kotak';
       setTimeout(() => { salinTeks.querySelector('span').textContent = 'Salin Teks'; }, 2200);
+    });
+  }
+
+
+  // ---------- Menolak, menurunkan, menghapus ----------
+  function galatTindakan(t) { const g = badan.querySelector('#galat-tindakan'); if (g) { g.textContent = t; g.hidden = !t; } }
+
+  function panelTindakan(terbit) {
+    return `
+      <section class="bagian" id="tindakan">
+        <h2>Tindakan lain</h2>
+        ${terbit
+          ? '<p class="kosong">Menurunkan jawaban menyembunyikannya dari umum dan mengembalikannya menjadi draf.</p><button type="button" class="tombol tombol-garis" id="turunkan" style="color:var(--bata);margin-top:10px">Turunkan dari terbit</button>'
+          : `<p class="kosong">Bila pertanyaan di luar arah LBM, tolak dengan alasan agar penanya tahu.</p>
+             <div class="kolom" style="margin-top:10px"><label for="alasan">Alasan penolakan</label><input id="alasan" type="text" maxlength="500" autocomplete="off" placeholder="Mis. di luar lingkup bahtsul masail LBM"></div>
+             <button type="button" class="tombol tombol-garis" id="tolak" style="color:var(--bata);margin-top:10px">Tolak Pertanyaan</button>`}
+        ${adalahAdmin(saya) ? '<button type="button" class="tautan-tombol tautan-bata" id="hapus" style="margin-top:14px">Hapus permanen (khusus admin)</button>' : ''}
+        <p class="galat" id="galat-tindakan" role="alert" hidden></p>
+      </section>`;
+  }
+
+  function gambarDitolak() {
+    badan.innerHTML = `
+      <section class="bagian">
+        <span class="tag-baris"><span class="tag">${esc(q.rubrik)}</span><span class="status status-lama">Ditolak</span></span>
+        <h2 style="margin-top:10px">Pertanyaan</h2>
+        <div class="teks-baca">${q.isi.split(/\n+/).map((p) => `<p>${esc(p)}</p>`).join('')}</div>
+        <p class="catatan" style="margin-top:8px">Dari ${esc(q.penanya?.nama || 'penanya')} · ${esc(tanggalId(q.dibuat_pada))}</p>
+      </section>
+      <section class="bagian" id="tindakan">
+        <h2>Ditolak</h2>
+        <div class="catatan-sunting"><b>Alasan yang dilihat penanya</b><p>${esc(q.alasan_tolak || '')}</p></div>
+        <button type="button" class="tombol tombol-hijau" id="buka-kembali" style="margin-top:12px">Buka Kembali</button>
+        ${adalahAdmin(saya) ? '<button type="button" class="tautan-tombol tautan-bata" id="hapus" style="margin-top:14px">Hapus permanen (khusus admin)</button>' : ''}
+        <p class="galat" id="galat-tindakan" role="alert" hidden></p>
+      </section>`;
+    pasangTindakan();
+  }
+
+  async function muatJawabanLagi() {
+    const { data } = await supa.from('jawaban').select('*').eq('pertanyaan_id', id).maybeSingle();
+    j = data;
+  }
+
+  function pasangTindakan() {
+    const ke = (s) => badan.querySelector(s);
+    ke('#tolak')?.addEventListener('click', async () => {
+      galatTindakan('');
+      const alasan = ke('#alasan').value.trim();
+      if (alasan.length < 3) { galatTindakan('Tulis alasan penolakan.'); return; }
+      if (!confirm('Tolak pertanyaan ini? Draf jawaban (bila ada) ikut dihapus dan penanya melihat alasannya.')) return;
+      const { error } = await supa.rpc('tolak_pertanyaan', { p_id: id, p_alasan: alasan });
+      if (error) { galatTindakan(pesanGalat(error)); return; }
+      q.status = 'ditolak'; q.alasan_tolak = alasan; j = null; gambar();
+    });
+    ke('#buka-kembali')?.addEventListener('click', async () => {
+      galatTindakan('');
+      const { error } = await supa.rpc('buka_kembali_pertanyaan', { p_id: id });
+      if (error) { galatTindakan(pesanGalat(error)); return; }
+      q.status = 'menunggu'; q.alasan_tolak = null; gambar();
+    });
+    ke('#turunkan')?.addEventListener('click', async () => {
+      galatTindakan('');
+      if (!confirm('Turunkan jawaban ini dari rubrik? Jawaban kembali menjadi draf.')) return;
+      const { error } = await supa.rpc('turunkan_jawaban', { p_pertanyaan: id });
+      if (error) { galatTindakan(pesanGalat(error)); return; }
+      q.status = 'ditelaah'; await muatJawabanLagi(); gambar();
+    });
+    ke('#hapus')?.addEventListener('click', async () => {
+      galatTindakan('');
+      if (!confirm('Hapus PERMANEN pertanyaan ini beserta drafnya? Tindakan ini tidak bisa dibatalkan.')) return;
+      const { error } = await supa.rpc('hapus_pertanyaan', { p_id: id });
+      if (error) { galatTindakan(pesanGalat(error)); return; }
+      ctx.pindah('/panel');
     });
   }
 

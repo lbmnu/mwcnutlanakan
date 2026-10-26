@@ -16,7 +16,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib|Alasan penolakan|Jawaban tidak ditemukan|Tulisan sudah ditolak|Tulisan masih terbit/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');
@@ -66,7 +66,7 @@ export function paragraf(teks) {
 
 export const RUBRIK = ['Bahtsul Masail', 'Tanya Fikih', 'Fikih Harian', 'Fikih Muamalah', 'Amaliyah Aswaja', 'Kajian Kitab'];
 export const JENIS = { jawaban_tim: 'Jawaban Tim', hasil_musyawarah: 'Hasil Musyawarah' };
-export const STATUS_TANYA = { menunggu: 'Menunggu Jawaban', ditelaah: 'Sedang Ditelaah', terjawab: 'Terjawab' };
+export const STATUS_TANYA = { menunggu: 'Menunggu Jawaban', ditelaah: 'Sedang Ditelaah', terjawab: 'Terjawab', ditolak: 'Ditolak' };
 
 export const tautanJawaban = (id) => `${location.origin}${location.pathname}#/jawaban/${id}`;
 
@@ -104,6 +104,7 @@ export const STATUS_TULISAN = {
   menunggu_penulis: ['Menunggu persetujuan Anda', 'lama'],
   disetujui: ['Disetujui, siap terbit', 'ditelaah'],
   dikembalikan: ['Perlu Anda perbaiki', 'lama'],
+  ditolak: ['Ditolak', 'lama'],
   terbit: ['Terbit', 'terjawab']
 };
 export const tautanTulisan = (id) => `${location.origin}${location.pathname}#/tulisan/${id}`;

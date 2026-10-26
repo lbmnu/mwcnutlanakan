@@ -8,6 +8,7 @@ export function tampil(el, ctx) {
   const masuk = !!ctx.state.session;
   const awal = new URLSearchParams(location.hash.split('?')[1] || '').get('r') || '';
   let rubrik = RUBRIK.includes(awal) ? awal : '';
+  if (masuk) { location.replace(`#/pustaka?t=jawaban${rubrik ? '&r=' + encodeURIComponent(rubrik) : ''}`); return; }
   el.innerHTML = `
   <div class="dalam-krem">
     <header class="bilah-hijau">

@@ -32,6 +32,7 @@ export async function tampil(el, ctx) {
       tambahan = `<div class="catatan-sunting"><b>Catatan penyunting</b><p>${esc(t.catatan_penyunting)}</p></div>`;
       aksi = `<a class="tombol tombol-hijau tombol-kecil" href="#/tulis?id=${esc(t.id)}">Perbaiki dan kirim ulang</a>`;
     }
+    if (t.status === 'ditolak') tambahan = `<div class="catatan-sunting"><b>Mohon maaf, naskah ini belum dapat diterbitkan</b><p>${esc(t.catatan_penyunting)}</p></div>`;
     if (t.status === 'dikirim') aksi = `<a class="tautan-hijau" href="#/tulis?id=${esc(t.id)}">Ubah naskah</a>`;
     if (t.status === 'menunggu_penulis') {
       tambahan = `
@@ -52,7 +53,7 @@ export async function tampil(el, ctx) {
         <strong class="isi-ringkas">${esc(t.judul)}</strong>
         <small>Dikirim ${esc(tanggalId(t.dibuat_pada))}</small>
         ${tambahan}
-        <div class="baris-tombol" style="margin-top:6px">${aksi}${bisaTarik ? `<button type="button" class="tautan-tombol tautan-bata" data-tarik="${esc(t.id)}">Tarik naskah</button>` : ''}</div>
+        <div class="baris-tombol" style="margin-top:6px">${aksi}${bisaTarik ? `<button type="button" class="tautan-tombol tautan-bata" data-tarik="${esc(t.id)}">${t.status === 'ditolak' ? 'Hapus dari riwayat' : 'Tarik naskah'}</button>` : ''}</div>
         <p class="galat gl" role="alert" hidden></p>
       </section>`;
   }

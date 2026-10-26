@@ -5,9 +5,10 @@ import { esc, tanggalId } from '../lib/util.js';
 const KELOMPOK = {
   proses: ['dikirim', 'ditelaah', 'disetujui'],
   penulis: ['menunggu_penulis', 'dikembalikan'],
-  terbit: ['terbit']
+  terbit: ['terbit'],
+  ditolak: ['ditolak']
 };
-const LABEL = { dikirim: ['Baru', 'baru'], ditelaah: ['Sedang disunting', 'ditelaah'], disetujui: ['Disetujui penulis', 'terjawab'], menunggu_penulis: ['Menunggu penulis', 'lama'], dikembalikan: ['Dikembalikan', 'lama'], terbit: ['Terbit', 'terjawab'] };
+const LABEL = { dikirim: ['Baru', 'baru'], ditelaah: ['Sedang disunting', 'ditelaah'], disetujui: ['Disetujui penulis', 'terjawab'], menunggu_penulis: ['Menunggu penulis', 'lama'], dikembalikan: ['Dikembalikan', 'lama'], ditolak: ['Ditolak', 'ditolak'], terbit: ['Terbit', 'terjawab'] };
 
 // Antrean penyunting: naskah yang perlu dikerjakan, yang menunggu penulis, dan yang sudah terbit.
 export async function tampil(el, ctx) {
@@ -21,9 +22,10 @@ export async function tampil(el, ctx) {
     <main class="isi">
       <section class="bagian">
         <div class="tab" role="tablist" aria-label="Tahap tulisan">
-          <button type="button" role="tab" data-t="proses" aria-selected="true">Perlu Disunting <b id="n-proses">0</b></button>
+          <button type="button" role="tab" data-t="proses" aria-selected="true">Disunting <b id="n-proses">0</b></button>
           <button type="button" role="tab" data-t="penulis" aria-selected="false">Di Penulis <b id="n-penulis">0</b></button>
           <button type="button" role="tab" data-t="terbit" aria-selected="false">Terbit <b id="n-terbit">0</b></button>
+          <button type="button" role="tab" data-t="ditolak" aria-selected="false">Ditolak <b id="n-ditolak">0</b></button>
         </div>
       </section>
       <div id="hasil"><p class="kosong">Memuat…</p></div>
@@ -35,7 +37,7 @@ export async function tampil(el, ctx) {
     for (const k of Object.keys(KELOMPOK)) el.querySelector('#n-' + k).textContent = String(semua.filter((t) => KELOMPOK[k].includes(t.status)).length);
     const isi = semua.filter((t) => KELOMPOK[tab].includes(t.status));
     if (!isi.length) {
-      hasil.innerHTML = `<div class="bagian"><p class="kosong">${{ proses: 'Tidak ada naskah yang menunggu.', penulis: 'Tidak ada naskah yang sedang di tangan penulis.', terbit: 'Belum ada tulisan yang terbit.' }[tab]}</p></div>`;
+      hasil.innerHTML = `<div class="bagian"><p class="kosong">${{ proses: 'Tidak ada naskah yang menunggu.', penulis: 'Tidak ada naskah yang sedang di tangan penulis.', terbit: 'Belum ada tulisan yang terbit.', ditolak: 'Belum ada tulisan yang ditolak.' }[tab]}</p></div>`;
       return;
     }
     hasil.innerHTML = isi.map((t) => {
