@@ -312,3 +312,10 @@ button { cursor: pointer; }
 .petunjuk-kode { margin: 0; font-size: 12.5px; line-height: 1.5; }
 .kaca .kotak-kode { background: rgba(255,255,255,.14); color: #fff; }
 .kaca .kotak-kode .tombol-garis { color: #fff; }
+
+.bilah-hijau .salam { flex: 1; min-width: 0; }
+
+/* ---------- Logo LBM di kanan atas kepala hijau (semua layar dalam) ---------- */
+.bilah-hijau { position: relative; padding-right: 86px; }
+.bilah-hijau::after { content: ""; position: absolute; top: max(16px, env(safe-area-inset-top)); right: 16px; width: 58px; height: 42px; background: url('../icons/logo-lbm.svg') center / contain no-repeat; pointer-events: none; }
+.bilah-hijau .lencana { align-self: flex-start; }
