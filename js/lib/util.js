@@ -16,7 +16,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');
@@ -50,6 +50,12 @@ export function tanggalId(iso, singkat = false) {
   if (isNaN(d)) return '';
   const b = BULAN[d.getMonth()];
   return `${d.getDate()} ${singkat ? b.slice(0, 3) : b} ${d.getFullYear()}`;
+}
+
+// "2026-10-01" -> "Oktober 2026"
+export function bulanTahun(tglIso) {
+  const [t, b] = String(tglIso || '').split('-').map(Number);
+  return t && b ? `${BULAN[b - 1]} ${t}` : '';
 }
 
 // Memecah teks menjadi paragraf aman (baris kosong = paragraf baru).

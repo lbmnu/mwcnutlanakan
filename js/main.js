@@ -16,6 +16,10 @@ import * as rubrik from './views/rubrik.js';
 import * as kas from './views/kas.js';
 import * as profil from './views/profil.js';
 import * as lupaSandi from './views/lupa-sandi.js';
+import * as absen from './views/absen.js';
+import * as kartu from './views/kartu.js';
+import * as majelis from './views/majelis.js';
+import * as kehadiran from './views/kehadiran.js';
 import { pasangLihatSandi } from './lib/lihat-sandi.js';
 
 const app = document.getElementById('app');
@@ -39,6 +43,10 @@ const daftarRute = [
   { pola: /^\/rubrik$/, modul: rubrik, jenis: 'dalam' },
   { pola: /^\/kas$/, modul: kas, jenis: 'dalam' },
   { pola: /^\/profil$/, modul: profil, jenis: 'dalam' },
+  { pola: /^\/absen$/, modul: absen, jenis: 'dalam' },
+  { pola: /^\/kartu$/, modul: kartu, jenis: 'dalam' },
+  { pola: /^\/majelis$/, modul: majelis, jenis: 'dalam' },
+  { pola: /^\/kehadiran$/, modul: kehadiran, jenis: 'dalam' },
   { pola: /^\/tanya$/, modul: tanya, jenis: 'dalam' },
   { pola: /^\/panel$/, modul: panelPertanyaan, jenis: 'dalam' },
   { pola: new RegExp(`^/panel/jawab/${UUID}$`), modul: panelJawab, jenis: 'dalam' }
@@ -61,7 +69,11 @@ function jaga(jalur) {
   const r = cocokkan(jalur);
   if (r && r.jenis === 'bebas') return jalur;
   if (!siap) return r && r.jenis === 'tamu' ? jalur : '/';
-  if (!state.session) return r && r.jenis === 'tamu' ? jalur : '/masuk';
+  if (!state.session) {
+    // Tautan QR absen dibuka sebelum masuk: ingat, lalu lanjutkan setelah masuk.
+    if (jalur === '/absen') { try { sessionStorage.setItem('lbm-lanjut', location.hash); } catch (_) {} }
+    return r && r.jenis === 'tamu' ? jalur : '/masuk';
+  }
   if (!state.profil || state.profil.status !== 'aktif') return '/menunggu';
   if (state.profil.wajib_ganti_sandi) return '/ganti-sandi';
   if (!r || r.jenis === 'tamu' || r.jenis === 'khusus') return '/dasbor';
@@ -72,6 +84,12 @@ function gambar() {
   if (!siapMemuat) { app.innerHTML = '<div class="gelap"><div class="tengah"><p>Memuat…</p></div></div>'; return; }
   const diminta = jalurSaatIni();
   const tujuan = jaga(diminta);
+  if (tujuan !== diminta && tujuan === '/dasbor' && state.profil?.status === 'aktif') {
+    // Setelah masuk: lanjutkan ke tautan absen yang tertunda (bila ada).
+    let lanjut = null;
+    try { lanjut = sessionStorage.getItem('lbm-lanjut'); sessionStorage.removeItem('lbm-lanjut'); } catch (_) {}
+    if (lanjut && /^#\/absen\?k=\d{6}$/.test(lanjut)) { location.replace(lanjut); return; }
+  }
   if (tujuan !== diminta) { location.replace('#' + tujuan); return; }
   if (bersihkan) { try { bersihkan(); } catch (_) {} bersihkan = null; }
   document.title = JUDUL;

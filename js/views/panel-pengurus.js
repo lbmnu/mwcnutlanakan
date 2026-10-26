@@ -4,6 +4,7 @@ import { layar, segeraHadir } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
 import { bisaSetujui } from '../state.js';
 import { esc, ikon, tanggalId, pesanGalat } from '../lib/util.js';
+import { sesiAktif, judulSesi } from '../lib/absen.js';
 
 const namaTipe = (t) => (t === 'pengurus_struktural' ? 'Pengurus Struktural' : 'Warga NU');
 const ringkas = (t, n = 110) => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).trimEnd() + '…' : s; };
@@ -25,7 +26,7 @@ export function tampil(el, ctx) {
         <div><b id="st-menunggu">…</b><small>Menunggu persetujuan</small></div>
         <div><b id="st-tanya">${tim ? '…' : '–'}</b><small>Pertanyaan belum dijawab</small></div>
       </div>
-      ${segeraHadir('Sesi Absen Bulanan', 'Pembukaan sesi, kode 6 digit, dan QR majelis menyusul pada tahap berikutnya.')}
+      <section class="bagian" id="sesi-absen"><p class="kosong">Memuat…</p></section>
       <section class="bagian">
         <div class="baris-judul"><h2>Menunggu Persetujuan</h2><span class="tag" id="lencana-menunggu">…</span></div>
         ${setujui ? '<div id="daftar-menunggu"><p class="kosong">Memuat…</p></div>' : '<p class="kosong">Persetujuan pendaftar dilakukan oleh Ketua, Wakil Ketua, Sekretaris, atau admin.</p>'}
@@ -47,9 +48,9 @@ export function tampil(el, ctx) {
         <div id="struktur"><p class="kosong">Memuat…</p></div>
       </section>
       <section class="bagian">
-        <div class="baris-judul"><h2>Warga per Ranting</h2><button type="button" class="tautan-hijau tautan-tombol" id="semua-ranting" hidden>Lihat 17 ranting</button></div>
+        <div class="baris-judul"><h2 id="judul-ranting">Warga per Ranting</h2><button type="button" class="tautan-hijau tautan-tombol" id="semua-ranting" hidden>Lihat 17 ranting</button></div>
         <div id="ranting"><p class="kosong">Memuat…</p></div>
-        <p class="kosong">Partisipasi (absen, musyawarah, tulisan) per ranting menyusul pada tahap berikutnya.</p>
+        <p class="kosong" id="cat-ranting">Keaktifan musyawarah dan tulisan per ranting menyusul pada tahap berikutnya.</p>
       </section>`
   });
 
@@ -61,7 +62,7 @@ export function tampil(el, ctx) {
   if (setujui) bantuSandi(isi.querySelector('#bantu-sandi'), p);
   if (tim) muatAntrean(isi.querySelector('#antrean'));
   muatStruktur(isi.querySelector('#struktur'));
-  muatRanting(isi);
+  muatSesiLaluRanting(isi, p, setujui);
   return bersihPasang;
 }
 
@@ -167,26 +168,89 @@ async function muatStruktur(kotak) {
   }).join('');
 }
 
-async function muatRanting(isi) {
+// Sesi absen dimuat dulu, lalu rekap ranting mengikuti sesi yang sama.
+async function muatSesiLaluRanting(isi, saya, setujui) {
+  const kotak = isi.querySelector('#sesi-absen');
+  const sesi = await sesiAktif();
+  if (!kotak.isConnected) return;
+  await gambarSesi(isi, kotak, sesi, saya, setujui);
+  muatRanting(isi, sesi);
+}
+
+async function gambarSesi(isi, kotak, sesi, saya, setujui) {
+  if (sesi === undefined) { kotak.innerHTML = '<h2>Sesi Absen</h2><p class="galat">Status sesi belum bisa dimuat.</p>'; return; }
+  let hadir = null;
+  if (sesi) {
+    const { count } = await supa.from('absensi').select('id', { count: 'exact', head: true }).eq('sesi_id', sesi.id);
+    hadir = count;
+  }
+  const buka = !!sesi && sesi.status === 'buka';
+  const judul = sesi ? judulSesi(sesi) : 'Sesi Absen Bulanan';
+  kotak.innerHTML = `
+    <div class="baris-judul"><h2>${esc(judul)}</h2><span class="tag ${buka ? 'tag-hadir' : 'tag-garis'}">${buka ? 'Dibuka' : sesi ? 'Ditutup' : 'Belum dibuka'}</span></div>
+    <p class="kosong">${buka ? `Sedang berlangsung. ${hadir ?? 0} warga sudah tercatat hadir.` : sesi ? `Sesi terakhir ditutup dengan ${hadir ?? 0} warga hadir.` : 'Buka sesi saat rutinan dimulai, lalu tampilkan layar majelis di proyektor.'}</p>
+    <div class="dua-tombol" style="margin-top:12px;flex-wrap:wrap">
+      ${buka && setujui ? '<a class="tombol tombol-hijau" href="#/majelis">Layar Majelis</a>' : ''}
+      ${buka ? '<a class="tombol tombol-garis" style="color:var(--hijau-tengah)" href="#/kehadiran">Catat / Pindai</a>' : ''}
+      ${!buka && setujui ? '<button type="button" class="tombol tombol-hijau" data-buka>Buka Sesi</button>' : ''}
+    </div>
+    ${buka && setujui ? '<button type="button" class="tautan-hijau tautan-tombol" data-tutup style="margin-top:10px;color:var(--bata)">Tutup sesi ini</button>' : ''}
+    <p class="galat" id="galat-sesi" hidden></p>`;
+  const galat = (t) => { const g = kotak.querySelector('#galat-sesi'); g.textContent = t; g.hidden = !t; };
+  const ulang = async () => { const baru = await sesiAktif(); await gambarSesi(isi, kotak, baru, saya, setujui); muatRanting(isi, baru); };
+  kotak.querySelector('[data-buka]')?.addEventListener('click', async (e) => {
+    e.target.disabled = true;
+    const { error } = await supa.rpc('buka_sesi_absen', { p_judul: '' });
+    if (error) { e.target.disabled = false; galat(pesanGalat(error)); return; }
+    ulang();
+  });
+  kotak.querySelector('[data-tutup]')?.addEventListener('click', async () => {
+    if (!confirm('Tutup sesi absen? Warga tidak bisa absen lagi setelah ditutup.')) return;
+    const { error } = await supa.rpc('tutup_sesi_absen', { p_id: sesi.id });
+    if (error) { galat(pesanGalat(error)); return; }
+    ulang();
+  });
+}
+
+// Rekap per ranting. Bila ada sesi: hadir/total dan daftar yang belum hadir; bila tidak: jumlah warga aktif.
+async function muatRanting(isi, sesi) {
   const kotak = isi.querySelector('#ranting');
   const tombol = isi.querySelector('#semua-ranting');
-  const [r, w] = await Promise.all([
+  if (!kotak) return;
+  const [r, w, a] = await Promise.all([
     supa.from('ranting').select('id,nama').order('nama'),
-    supa.from('profil').select('ranting_id').eq('status', 'aktif')
+    supa.from('profil').select('id,nama,wa,ranting_id').eq('status', 'aktif').order('nama', { ascending: true }),
+    sesi ? supa.from('absensi').select('profil_id').eq('sesi_id', sesi.id) : Promise.resolve({ data: [] })
   ]);
-  if (r.error || w.error) { kotak.innerHTML = '<p class="galat">Data ranting belum bisa dimuat.</p>'; return; }
-  const n = new Map();
-  for (const x of w.data) n.set(x.ranting_id, (n.get(x.ranting_id) || 0) + 1);
-  const baris = r.data.map((x) => ({ nama: x.nama, n: n.get(x.id) || 0 })).sort((a, b) => b.n - a.n || a.nama.localeCompare(b.nama, 'id'));
-  const maks = Math.max(1, ...baris.map((x) => x.n));
-  let semua = false;
+  if (r.error || w.error || a.error) { kotak.innerHTML = '<p class="galat">Data ranting belum bisa dimuat.</p>'; return; }
+  const sudah = new Set(a.data.map((x) => x.profil_id));
+  const per = new Map(r.data.map((x) => [x.id, { nama: x.nama, total: 0, hadir: 0, belum: [] }]));
+  const tanpa = { nama: 'Tanpa ranting', total: 0, hadir: 0, belum: [] };
+  for (const x of w.data) {
+    const g = per.get(x.ranting_id) || tanpa;
+    g.total++;
+    if (sudah.has(x.id)) g.hadir++; else g.belum.push(x);
+  }
+  const baris = [...per.values()].filter((g) => g.total > 0 || sesi).sort((a2, b2) => (sesi ? (b2.hadir / (b2.total || 1)) - (a2.hadir / (a2.total || 1)) : b2.total - a2.total) || a2.nama.localeCompare(b2.nama, 'id'));
+  if (tanpa.total) baris.push(tanpa);
+  isi.querySelector('#judul-ranting').textContent = sesi ? 'Kehadiran per Ranting' : 'Warga per Ranting';
+  const maks = Math.max(1, ...baris.map((g) => (sesi ? g.total : g.total)));
+  let semua = false; let terbuka = null;
   const gambar = () => {
     const tampil = semua ? baris : baris.slice(0, 5);
-    kotak.innerHTML = tampil.map((x) => `<div class="batang"><span>${esc(x.nama)}</span><i style="--w:${Math.round((x.n / maks) * 100)}%"></i><b>${x.n}</b></div>`).join('');
+    kotak.innerHTML = tampil.map((g, i) => {
+      const lebar = sesi ? (g.total ? Math.round((g.hadir / g.total) * 100) : 0) : Math.round((g.total / maks) * 100);
+      const angka = sesi ? `${g.hadir}/${g.total}` : String(g.total);
+      const rincian = sesi && terbuka === g.nama ? `<div class="belum-hadir">${g.belum.length ? g.belum.map((x) => `<div class="baris"><div class="teks"><strong>${esc(x.nama)}</strong></div><a class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" href="https://wa.me/${esc(x.wa)}?text=${encodeURIComponent('Assalamu’alaikum Wr. Wb. Bapak/Ibu ' + x.nama + ', kami dari LBM MWCNU Tlanakan. Kami belum mencatat kehadiran Anda pada rutinan bulan ini. Jika Anda hadir, mohon absen lewat aplikasi atau kabari kami. Terima kasih. Wassalamu’alaikum Wr. Wb.')}">${ikon('wa')} Ingatkan</a></div>`).join('') : '<p class="kosong">Semua warga ranting ini sudah hadir.</p>'}</div>` : '';
+      return `<div class="batang${sesi ? ' bisa-buka' : ''}"${sesi ? ` data-r="${esc(g.nama)}" role="button" tabindex="0" aria-expanded="${terbuka === g.nama}"` : ''}><span>${esc(g.nama)}</span><i style="--w:${lebar}%"></i><b>${angka}</b></div>${rincian}`;
+    }).join('');
     tombol.textContent = semua ? 'Ringkas' : `Lihat ${baris.length} ranting`;
+    if (sesi) isi.querySelector('#cat-ranting').textContent = 'Ketuk nama ranting untuk melihat warga yang belum hadir. Keaktifan musyawarah dan tulisan menyusul.';
   };
+  kotak.onclick = (e) => { const b = e.target.closest('[data-r]'); if (!b) return; terbuka = terbuka === b.dataset.r ? null : b.dataset.r; gambar(); };
+  kotak.onkeydown = (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-r]')) { e.preventDefault(); e.target.click(); } };
   tombol.hidden = baris.length <= 5;
-  tombol.addEventListener('click', () => { semua = !semua; gambar(); });
+  tombol.onclick = () => { semua = !semua; gambar(); };
   gambar();
 }
 

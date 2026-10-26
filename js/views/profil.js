@@ -3,6 +3,7 @@ import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
 import { kotakKode, pasangSalin, statusKode, teksStatus } from '../lib/pemulihan.js';
 import { adalahPengurus } from '../state.js';
+import { pasangRingHadir } from '../lib/ring-hadir.js';
 import { esc, tanggalId, STATUS_TANYA } from '../lib/util.js';
 
 const ringkas = (t, n = 120) => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).trimEnd() + '…' : s; };
@@ -16,13 +17,8 @@ export function tampil(el, ctx) {
     kanan: `<span class="lencana lencana-isi">${adalahPengurus(p) ? 'Pengurus Aktif' : 'Warga Aktif'}</span>`,
     isi: `
       <div id="pasang"></div>
-      <section class="bagian kartu-ring segera" aria-label="Tingkat Partisipasi">
-        <div class="ring kosong-ring" aria-hidden="true"><div><b>–</b>dari 100</div></div>
-        <div class="batang-ring">
-          <div class="baris-judul"><h2>Tingkat Partisipasi</h2><span class="tag tag-garis">Segera hadir</span></div>
-          <small>Hanya Anda yang akan melihat statistik ini.</small>
-        </div>
-      </section>
+      <section class="bagian kartu-ring" id="ring-hadir" aria-label="Kehadiran rutinan"><p class="kosong">Memuat…</p></section>
+      <a class="tombol tombol-hijau" href="#/kartu">Tampilkan Kartu Saya</a>
       <section class="bagian">
         <div class="baris-judul"><h2>Riwayat Pertanyaan</h2><a class="tautan-hijau" href="#/tanya">Tanya baru</a></div>
         <div id="riwayat"><p class="kosong">Memuat…</p></div>
@@ -46,6 +42,7 @@ export function tampil(el, ctx) {
   isi.querySelector('#keluar').addEventListener('click', async () => { await supa.auth.signOut(); location.hash = '#/'; ctx.segarkan(); });
   muatRiwayat(isi.querySelector('#riwayat'));
   kodePemulihan(isi);
+  pasangRingHadir(isi.querySelector('#ring-hadir'));
   return bersihPasang;
 }
 
