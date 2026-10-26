@@ -31,12 +31,18 @@ export function tampil(el, ctx) {
           <a class="tombol tombol-garis" href="#/profil" style="color:var(--hijau-tengah)">Riwayat Tanya</a>
         </div>
       </section>
-      <section class="bagian segera kartu-tulisan">
-        <div>
-          <div class="baris-judul"><h2>Kirim Tulisan</h2><span class="tag tag-garis">Segera hadir</span></div>
-          <p class="kosong">Khotbah Jumat, artikel turats, atau esai ke-NU-an. Naskah disunting Tim Penyunting sebelum terbit.</p>
+      <section class="bagian">
+        <div class="kartu-tulisan">
+          <div>
+            <h2>Kirim Tulisan</h2>
+            <p class="kosong">Khotbah Jumat, artikel turats, atau esai ke-NU-an. Naskah disunting Tim Penyunting sebelum terbit, dan nama Anda dicantumkan sebagai penulis.</p>
+          </div>
+          ${ubin('pena')}
         </div>
-        ${ubin('pena')}
+        <div class="dua-tombol" style="margin-top:12px">
+          <a class="tombol tombol-hijau" href="#/tulis">Tulis Sekarang</a>
+          <a class="tombol tombol-garis" href="#/tulisan" style="color:var(--hijau-tengah)">Baca Tulisan</a>
+        </div>
       </section>`
   });
   const bersihPasang = pasangKartu(isi.querySelector('#pasang'));

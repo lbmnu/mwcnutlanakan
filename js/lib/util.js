@@ -16,7 +16,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');
@@ -94,4 +94,20 @@ export const rpTanda = (n) => `${Number(n) < 0 ? '−' : ''}${rp(n)}`;
 // Tanggal hari ini menurut WIB, bentuk "2026-10-26" (cocok untuk <input type=date>).
 export function hariIniWib() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+
+// ---------- Tulisan ----------
+export const BENTUK_TULISAN = ['Khotbah Jumat', 'Artikel', 'Kolom', 'Esai', 'Lainnya'];
+export const STATUS_TULISAN = {
+  dikirim: ['Menunggu penyunting', 'menunggu'],
+  ditelaah: ['Sedang disunting', 'ditelaah'],
+  menunggu_penulis: ['Menunggu persetujuan Anda', 'lama'],
+  disetujui: ['Disetujui, siap terbit', 'ditelaah'],
+  dikembalikan: ['Perlu Anda perbaiki', 'lama'],
+  terbit: ['Terbit', 'terjawab']
+};
+export const tautanTulisan = (id) => `${location.origin}${location.pathname}#/tulisan/${id}`;
+export function teksBagikanTulisan(t) {
+  const oleh = t.penulis ? ` karya ${t.penulis}` : '';
+  return `Assalamu’alaikum Wr. Wb.\n\nAlhamdulillah, telah terbit tulisan${oleh} di website LBM MWCNU Tlanakan:\n\n${t.judul}\n\nSilakan simak selengkapnya melalui tautan berikut: ${tautanTulisan(t.id)}\n\nSemoga bermanfaat.\nWassalamu’alaikum Wr. Wb.`;
 }

@@ -395,3 +395,18 @@ button { cursor: pointer; }
 .kas-mini small { color: var(--teks-redam); font-size: 12px; }
 .transaksi small { display: block; }
 .transaksi .tautan-bata { display: block; text-align: left; }
+
+/* ---------- Tulisan (tahap 5) ---------- */
+.centang { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.4; }
+.centang input { width: 22px; height: 22px; margin-top: 1px; flex: none; accent-color: var(--hijau-tengah); }
+.kartu-tulisan-saya { display: flex; flex-direction: column; gap: 6px; }
+.kartu-tulisan-saya small { color: var(--teks-redam); }
+.catatan-sunting { background: var(--emas-pucat); border-radius: 14px; padding: 10px 12px; font-size: 13px; line-height: 1.5; }
+.catatan-sunting p { margin: 4px 0 0; }
+.banding { margin-top: 8px; }
+.banding summary { cursor: pointer; font-weight: 700; font-size: 13px; color: var(--hijau-tengah); min-height: 40px; display: flex; align-items: center; }
+.dua-versi { display: grid; gap: 14px; margin-top: 8px; }
+.dua-versi h3 { font-size: 13px; margin: 0 0 4px; color: var(--teks-redam); }
+.judul-mini { font-weight: 700; margin: 6px 0; }
+@media (min-width: 720px) { .dua-versi { grid-template-columns: 1fr 1fr; } }
+.kartu-tulisan h2 { margin: 0 0 4px; }

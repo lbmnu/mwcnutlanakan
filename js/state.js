@@ -18,6 +18,10 @@ export async function muatProfil() {
 export const bisaKas = (p) =>
   !!p && p.status === 'aktif' && (p.peran === 'admin' || ['ketua', 'wakil_ketua', 'bendahara'].includes(p.jabatan_lbm));
 
+// Penyunting tulisan: Ketua, Wakil Ketua, admin, atau akun bertanda tim_penyunting (sama dengan adalah_penyunting di database).
+export const adalahPenyunting = (p) =>
+  !!p && p.status === 'aktif' && (p.tim_penyunting === true || p.peran === 'admin' || ['ketua', 'wakil_ketua'].includes(p.jabatan_lbm));
+
 export const bisaSetujui = (p) =>
   !!p && p.status === 'aktif' && (p.peran === 'admin' || ['ketua', 'wakil_ketua', 'sekretaris'].includes(p.jabatan_lbm));
 

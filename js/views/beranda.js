@@ -29,7 +29,7 @@ export function tampil(el, ctx) {
       if (!k) return;
       k.innerHTML = j
         ? `<a class="pasang banner-jawaban" href="#/jawaban/${esc(j.id)}"><p><small>Jawaban terbaru · ${esc(j.rubrik)}</small><strong>${esc(j.judul)}</strong></p>${ikon('panah')}</a>
-           <p class="teks-kecil-terang" style="margin-top:10px"><a class="tautan-emas" href="#/jawaban">Lihat semua jawaban</a></p>`
+           <p class="teks-kecil-terang" style="margin-top:10px"><a class="tautan-emas" href="#/jawaban">Lihat semua jawaban</a> · <a class="tautan-emas" href="#/tulisan">Baca tulisan warga</a></p>`
         : '';
     });
   }

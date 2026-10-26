@@ -2,7 +2,7 @@ import { supa } from '../lib/supa.js';
 import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
-import { bisaSetujui, bisaKas } from '../state.js';
+import { bisaSetujui, bisaKas, adalahPenyunting } from '../state.js';
 import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda } from '../lib/util.js';
 import { sesiAktif, judulSesi } from '../lib/absen.js';
 
@@ -27,6 +27,7 @@ export function tampil(el, ctx) {
         <div><b id="st-tanya">${tim ? '…' : '–'}</b><small>Pertanyaan belum dijawab</small></div>
       </div>
       <section class="bagian" id="sesi-absen"><p class="kosong">Memuat…</p></section>
+      ${adalahPenyunting(p) ? '<section class="bagian" id="antrean-tulisan"><p class="kosong">Memuat…</p></section>' : ''}
       <section class="bagian" id="kas-ringkas"><p class="kosong">Memuat…</p></section>
       <section class="bagian">
         <div class="baris-judul"><h2>Menunggu Persetujuan</h2><span class="tag" id="lencana-menunggu">…</span></div>
@@ -60,6 +61,7 @@ export function tampil(el, ctx) {
   const muatSemua = () => muatAngka(isi, tim);
   muatSemua();
   muatKasRingkas(isi, bisaKas(p));
+  if (adalahPenyunting(p)) muatAntreanTulisan(isi);
   if (setujui) muatMenunggu(isi.querySelector('#daftar-menunggu'), muatSemua);
   if (setujui) bantuSandi(isi.querySelector('#bantu-sandi'), p);
   if (tim) muatAntrean(isi.querySelector('#antrean'));
@@ -315,4 +317,18 @@ async function muatKasRingkas(isi, boleh) {
     <div class="baris-judul"><h2>Kas LBM</h2><a class="tautan-hijau" href="#/kas">${boleh ? 'Catat / rincian' : 'Rincian'}</a></div>
     <div class="kas-mini"><b>${esc(rpTanda(r.saldo))}</b><small>Saldo kas saat ini</small></div>
     <p class="kosong">Bulan ini: masuk ${esc(rp(r.masuk_bulan))}, keluar ${esc(rp(r.keluar_bulan))}.</p>`;
+}
+
+// Kartu antrean tulisan untuk penyunting.
+async function muatAntreanTulisan(isi) {
+  const k = isi.querySelector('#antrean-tulisan');
+  const { data, error } = await supa.from('tulisan').select('id,status').in('status', ['dikirim', 'ditelaah', 'disetujui', 'menunggu_penulis', 'dikembalikan']);
+  if (error) { k.innerHTML = '<div class="baris-judul"><h2>Antrean Tulisan</h2></div><p class="kosong">Belum bisa dimuat.</p>'; return; }
+  const perlu = data.filter((t) => ['dikirim', 'ditelaah', 'disetujui'].includes(t.status)).length;
+  const baru = data.filter((t) => t.status === 'dikirim').length;
+  const dipenulis = data.length - perlu;
+  k.innerHTML = `
+    <div class="baris-judul"><h2>Antrean Tulisan</h2><a class="tautan-hijau" href="#/panel/tulisan">Buka antrean</a></div>
+    <div class="kas-mini"><b>${perlu}</b><small>Naskah perlu disunting${baru ? ` (${baru} baru)` : ''}</small></div>
+    <p class="kosong">${dipenulis} naskah sedang di tangan penulis.</p>`;
 }

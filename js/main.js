@@ -20,6 +20,12 @@ import * as absen from './views/absen.js';
 import * as kartu from './views/kartu.js';
 import * as majelis from './views/majelis.js';
 import * as kehadiran from './views/kehadiran.js';
+import * as tulis from './views/tulis.js';
+import * as tulisanSaya from './views/tulisan-saya.js';
+import * as tulisanDaftar from './views/tulisan-daftar.js';
+import * as tulisanBaca from './views/tulisan-baca.js';
+import * as panelTulisan from './views/panel-tulisan.js';
+import * as panelSunting from './views/panel-sunting.js';
 import { pasangLihatSandi } from './lib/lihat-sandi.js';
 
 const app = document.getElementById('app');
@@ -36,6 +42,8 @@ const daftarRute = [
   { pola: /^\/lupa-sandi$/, modul: lupaSandi, jenis: 'tamu' },
   { pola: /^\/jawaban$/, modul: jawabanDaftar, jenis: 'bebas' },
   { pola: new RegExp(`^/jawaban/${UUID}$`), modul: jawabanBaca, jenis: 'bebas' },
+  { pola: /^\/tulisan$/, modul: tulisanDaftar, jenis: 'bebas' },
+  { pola: new RegExp(`^/tulisan/${UUID}$`), modul: tulisanBaca, jenis: 'bebas' },
   { pola: /^\/menunggu$/, modul: menunggu, jenis: 'khusus' },
   { pola: /^\/ganti-sandi$/, modul: gantisandi, jenis: 'khusus' },
   { pola: /^\/dasbor$/, modul: dasbor, jenis: 'dalam' },
@@ -48,6 +56,10 @@ const daftarRute = [
   { pola: /^\/majelis$/, modul: majelis, jenis: 'dalam' },
   { pola: /^\/kehadiran$/, modul: kehadiran, jenis: 'dalam' },
   { pola: /^\/tanya$/, modul: tanya, jenis: 'dalam' },
+  { pola: /^\/tulis$/, modul: tulis, jenis: 'dalam' },
+  { pola: /^\/tulisan-saya$/, modul: tulisanSaya, jenis: 'dalam' },
+  { pola: /^\/panel\/tulisan$/, modul: panelTulisan, jenis: 'dalam' },
+  { pola: new RegExp(`^/panel/tulisan/${UUID}$`), modul: panelSunting, jenis: 'dalam' },
   { pola: /^\/panel$/, modul: panelPertanyaan, jenis: 'dalam' },
   { pola: new RegExp(`^/panel/jawab/${UUID}$`), modul: panelJawab, jenis: 'dalam' }
 ];

@@ -16,7 +16,11 @@ export function tampil(el, ctx) {
     kecil: 'Pilih ruang yang Anda butuhkan',
     judul: 'Rubrik',
     peran: false,
-    isi: RUBRIK.map((r) => `
+    isi: `
+      <a class="kartu-rubrik" href="#/tulisan">
+        ${ubin('pena')}
+        <span class="isi-rubrik"><strong>Tulisan Warga</strong><small>Khotbah, artikel, kolom, dan esai.</small></span>
+      </a>` + RUBRIK.map((r) => `
       <a class="kartu-rubrik" href="#/jawaban?r=${encodeURIComponent(r)}">
         ${ubin(IKON_RUBRIK[r])}
         <span class="isi-rubrik"><strong>${esc(r)}</strong><small>${esc(URAIAN[r])}</small></span>

@@ -23,7 +23,11 @@ export function tampil(el, ctx) {
         <div class="baris-judul"><h2>Riwayat Pertanyaan</h2><a class="tautan-hijau" href="#/tanya">Tanya baru</a></div>
         <div id="riwayat"><p class="kosong">Memuat…</p></div>
       </section>
-      ${segeraHadir('Tulisan Saya', 'Naskah yang Anda kirim dan statusnya akan tampil di sini.')}
+      <section class="bagian">
+        <div class="baris-judul"><h2>Tulisan Saya</h2><a class="tautan-hijau" href="#/tulis">Tulis baru</a></div>
+        <p class="kosong">Naskah yang Anda kirim, statusnya, dan tanggapan penyunting.</p>
+        <a class="tombol tombol-garis" href="#/tulisan-saya" style="margin-top:12px;color:var(--hijau-tengah)">Lihat Tulisan Saya</a>
+      </section>
       <section class="bagian">
         <h2>Akun</h2>
         <div class="rincian"><span>Nomor WhatsApp</span><b>+${esc(p.wa)}</b></div>
