@@ -16,8 +16,10 @@ import * as rubrik from './views/rubrik.js';
 import * as kas from './views/kas.js';
 import * as profil from './views/profil.js';
 import * as lupaSandi from './views/lupa-sandi.js';
+import { pasangLihatSandi } from './lib/lihat-sandi.js';
 
 const app = document.getElementById('app');
+pasangLihatSandi(app);
 const JUDUL = 'LBM MWCNU Tlanakan';
 const UUID = '([0-9a-fA-F-]{36})';
 

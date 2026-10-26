@@ -72,7 +72,7 @@ button { cursor: pointer; }
 .form { display: flex; flex-direction: column; gap: 14px; }
 .kolom { display: flex; flex-direction: column; gap: 6px; }
 .kolom label, .kolom .judul-kolom { font-size: 13px; font-weight: 600; }
-.kolom input[type=text], .kolom input[type=tel], .kolom input[type=password], .kolom select {
+.kolom input[type=text], .kolom input[type=tel], .kolom input[type=password], .kolom .kolom-sandi input[type=text], .kolom select {
   width: 100%; height: var(--sentuh); padding: 0 14px; border-radius: 14px; font-size: 16px;
   border: 1px solid rgba(255,255,255,.42); background: rgba(255,255,255,.1); color: #fff;
 }
@@ -128,7 +128,7 @@ button { cursor: pointer; }
 .dalam-krem .pasang { background: var(--sage); border: 0; color: var(--teks); border-radius: 18px; }
 .dalam-krem .kolom label { color: var(--teks); }
 .dalam-krem .form { background: var(--putih); border: 1px solid var(--garis); border-radius: 22px; padding: 14px; }
-.dalam-krem .kolom input[type=password] { background: var(--putih); color: var(--teks); border: 1px solid #B9CFC2; }
+.dalam-krem .kolom input[type=password], .dalam-krem .kolom .kolom-sandi input[type=text] { background: var(--putih); color: var(--teks); border: 1px solid #B9CFC2; }
 .dalam-krem .kolom input::placeholder { color: var(--teks-redam); }
 .dalam-krem .tombol-garis { color: var(--hijau-tengah); }
 
@@ -319,3 +319,9 @@ button { cursor: pointer; }
 .bilah-hijau { position: relative; padding-right: 86px; }
 .bilah-hijau::after { content: ""; position: absolute; top: max(16px, env(safe-area-inset-top)); right: 16px; width: 58px; height: 42px; background: url('../icons/logo-lbm.svg') center / contain no-repeat; pointer-events: none; }
 .bilah-hijau .lencana { align-self: flex-start; }
+
+/* ---------- Tombol lihat kata sandi ---------- */
+.kolom-sandi { position: relative; display: block; width: 100%; }
+.kolom-sandi input { padding-right: 92px !important; width: 100%; }
+.lihat-sandi { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); min-height: 40px; min-width: 40px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(255,255,255,.18); color: var(--emas-muda); font-size: 13px; font-weight: 700; cursor: pointer; }
+.dalam-krem .lihat-sandi { background: var(--sage); color: var(--hijau-tengah); }
