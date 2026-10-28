@@ -151,6 +151,7 @@ button { cursor: pointer; }
 .kartu-tautan strong { font-size: 16px; line-height: 1.35; font-weight: 700; }
 .kartu-tautan .ringkas { font-size: 13px; line-height: 1.5; color: var(--teks-redam); }
 .kartu-tautan small { font-size: 12px; color: var(--teks-redam); }
+.kartu-tautan + .kartu-tautan { margin-top: 12px; }
 .kartu-datar { padding: 12px 0 0; border: 0; border-radius: 0; background: transparent; }
 .tag-baris { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .tag { font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 4px 9px; border-radius: 8px; background: var(--sage); color: var(--hijau-tengah); }
