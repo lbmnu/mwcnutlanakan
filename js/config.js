@@ -8,7 +8,11 @@ export const SUPABASE_ANON_KEY = 'sb_publishable_CIK8FeePerWSQSqu0Y9Nqg_djH4XZqL
 // Domain ini tidak pernah dipakai mengirim surat. Harus sama dengan di scripts/seed-pengurus.mjs.
 export const DOMAIN_AKUN = 'akun.lbm-tlanakan.id';
 
-// Nomor WA pengurus untuk tombol "Kabari Pengurus" (format 62...). Isi setelah dikonfirmasi.
-export const KONTAK_WA = '';
+// Kontak WA untuk tombol "Kabari Pengurus" (format 62..., tanpa + dan tanpa spasi).
+// Langsung ke Ketua dan Wakil Ketua. Mengganti nomor cukup mengubah di sini.
+export const KONTAK_PENGURUS = [
+  { peran: 'Ketua', nama: 'Ust. Syaifuddin', wa: '6285236548383' },
+  { peran: 'Wakil Ketua', nama: 'Ust. Subhan', wa: '6282336144472' }
+];
 
 export const terkonfigurasi = !SUPABASE_URL.startsWith('GANTI') && !SUPABASE_ANON_KEY.startsWith('GANTI');

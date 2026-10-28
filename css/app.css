@@ -412,3 +412,9 @@ button { cursor: pointer; }
 @media (min-width: 720px) { .dua-versi { grid-template-columns: 1fr 1fr; } }
 .kartu-tulisan h2 { margin: 0 0 4px; }
 .kartu-dalam { border: 0; box-shadow: none; padding: 0; margin-top: 8px; }
+
+/* keaktifan ranting (panel) */
+.aktif-baris { margin: 6px 0 10px; }
+.aktif-baris .batang { margin: 0 0 2px; }
+.aktif-baris .batang b { width: 40px; }
+.aktif-baris small { display: block; font-size: 12px; line-height: 1.4; color: var(--teks-redam); padding-left: 120px; }

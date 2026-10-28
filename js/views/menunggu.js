@@ -1,5 +1,5 @@
 import { supa } from '../lib/supa.js';
-import { KONTAK_WA } from '../config.js';
+import { KONTAK_PENGURUS } from '../config.js';
 import { esc, ikon } from '../lib/util.js';
 import { kotakKode, pasangSalin } from '../lib/pemulihan.js';
 
@@ -13,7 +13,8 @@ export function tampil(el, ctx) {
   else if (p.status === 'ditolak') { judul = 'Pendaftaran belum dapat disetujui'; isi = 'Silakan hubungi pengurus LBM untuk keterangan lebih lanjut.'; }
   else if (p.status === 'nonaktif') { judul = 'Akun dinonaktifkan'; isi = 'Silakan hubungi pengurus LBM bila ini keliru.'; }
 
-  const wa = KONTAK_WA ? `https://wa.me/${esc(KONTAK_WA)}?text=${encodeURIComponent('Assalamu’alaikum Wr. Wb. Saya ' + (p?.nama || '') + ', baru mendaftar di website LBM MWCNU Tlanakan. Mohon diverifikasi. Terima kasih.')}` : '';
+  const pesan = encodeURIComponent('Assalamu’alaikum Wr. Wb. Saya ' + (p?.nama || '') + ', baru mendaftar di website LBM MWCNU Tlanakan. Mohon diverifikasi. Terima kasih.');
+  const tombolWa = KONTAK_PENGURUS.filter((k) => k.wa).map((k, i) => `<a class="tombol ${i === 0 ? 'tombol-emas' : 'tombol-garis-terang'}" href="https://wa.me/${esc(k.wa)}?text=${pesan}">${ikon('wa')} Kabari ${esc(k.peran)}</a>`).join('');
 
   el.innerHTML = `
   <main class="gelap">
@@ -23,7 +24,7 @@ export function tampil(el, ctx) {
       <h1 style="margin:0;font-size:22px;font-weight:800">${esc(judul)}</h1>
       <p style="margin:0;font-size:14px;line-height:1.55;color:rgba(255,255,255,.92)">${esc(isi)}</p>
       ${ctx.state.kodeBaru ? `<div style="width:100%"><h2 style="margin:0 0 6px;font-size:16px">Kode pemulihan Anda</h2><p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:rgba(255,255,255,.92)">Dipakai bila suatu saat lupa kata sandi.</p>${kotakKode(ctx.state.kodeBaru)}</div>` : ''}
-      ${wa ? `<a class="tombol tombol-emas" href="${wa}">${ikon('wa')} Kabari Pengurus via WA</a>` : ''}
+      ${tombolWa}
       <button type="button" class="tombol tombol-garis-terang" id="muat">Periksa lagi</button>
       <button type="button" class="tautan-emas" id="keluar">Keluar</button>
     </section>

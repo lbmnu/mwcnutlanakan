@@ -5,6 +5,7 @@ import { ajakanKode } from '../lib/pemulihan.js';
 import { bisaSetujui, bisaKas, adalahPenyunting } from '../state.js';
 import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda } from '../lib/util.js';
 import { sesiAktif, judulSesi } from '../lib/absen.js';
+import { EKSPOR, unduhCsv } from '../lib/csv.js';
 
 const namaTipe = (t) => (t === 'pengurus_struktural' ? 'Pengurus Struktural' : 'Warga NU');
 const ringkas = (t, n = 110) => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n).trimEnd() + '…' : s; };
@@ -52,8 +53,16 @@ export function tampil(el, ctx) {
       <section class="bagian">
         <div class="baris-judul"><h2 id="judul-ranting">Warga per Ranting</h2><button type="button" class="tautan-hijau tautan-tombol" id="semua-ranting" hidden>Lihat 17 ranting</button></div>
         <div id="ranting"><p class="kosong">Memuat…</p></div>
-        <p class="kosong" id="cat-ranting">Keaktifan musyawarah dan tulisan per ranting menyusul pada tahap berikutnya.</p>
-      </section>`
+        <p class="kosong" id="cat-ranting"></p>
+      </section>
+      <section class="bagian" id="keaktifan"><p class="kosong">Memuat…</p></section>
+      ${setujui ? `
+      <section class="bagian" id="cadangan">
+        <h2>Cadangan Data (CSV)</h2>
+        <p class="kosong">Unduh berkas lalu simpan di Google Drive lembaga, sebaiknya sebulan sekali. Bisa dibuka di Excel atau Google Sheets.</p>
+        ${Object.entries(EKSPOR).map(([k, e]) => `<div class="baris"><div class="teks"><strong>${esc(e.judul)}</strong></div><button type="button" class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" data-ekspor="${k}">Unduh</button></div>`).join('')}
+        <p class="galat" id="galat-ekspor" hidden></p>
+      </section>` : ''}`
   });
 
   const bersihPasang = pasangKartu(isi.querySelector('#pasang'));
@@ -67,6 +76,8 @@ export function tampil(el, ctx) {
   if (tim) muatAntrean(isi.querySelector('#antrean'));
   muatStruktur(isi.querySelector('#struktur'));
   muatSesiLaluRanting(isi, p, setujui);
+  muatKeaktifan(isi.querySelector('#keaktifan'));
+  pasangCadangan(isi.querySelector('#cadangan'));
   return bersihPasang;
 }
 
@@ -249,7 +260,7 @@ async function muatRanting(isi, sesi) {
       return `<div class="batang${sesi ? ' bisa-buka' : ''}"${sesi ? ` data-r="${esc(g.nama)}" role="button" tabindex="0" aria-expanded="${terbuka === g.nama}"` : ''}><span>${esc(g.nama)}</span><i style="--w:${lebar}%"></i><b>${angka}</b></div>${rincian}`;
     }).join('');
     tombol.textContent = semua ? 'Ringkas' : `Lihat ${baris.length} ranting`;
-    if (sesi) isi.querySelector('#cat-ranting').textContent = 'Ketuk nama ranting untuk melihat warga yang belum hadir. Keaktifan musyawarah dan tulisan menyusul.';
+    if (sesi) isi.querySelector('#cat-ranting').textContent = 'Ketuk nama ranting untuk melihat warga yang belum hadir.';
   };
   kotak.onclick = (e) => { const b = e.target.closest('[data-r]'); if (!b) return; terbuka = terbuka === b.dataset.r ? null : b.dataset.r; gambar(); };
   kotak.onkeydown = (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-r]')) { e.preventDefault(); e.target.click(); } };
@@ -331,4 +342,45 @@ async function muatAntreanTulisan(isi) {
     <div class="baris-judul"><h2>Antrean Tulisan</h2><a class="tautan-hijau" href="#/panel/tulisan">Buka antrean</a></div>
     <div class="kas-mini"><b>${perlu}</b><small>Naskah perlu disunting${baru ? ` (${baru} baru)` : ''}</small></div>
     <p class="kosong">${dipenulis} naskah sedang di tangan penulis.</p>`;
+}
+
+
+// Keaktifan per ranting untuk bulan berjalan: kehadiran rutinan, tulisan terbit, pertanyaan yang sudah dijawab.
+// Hanya angka per ranting; nama penanya/penulis tidak ditampilkan di sini.
+async function muatKeaktifan(kotak) {
+  if (!kotak) return;
+  const { data, error } = await supa.rpc('keaktifan_ranting');
+  if (!kotak.isConnected) return;
+  const bulan = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
+  if (error) { kotak.innerHTML = `<h2>Keaktifan Ranting</h2><p class="galat">${esc(pesanGalat(error))}</p>`; return; }
+  const baris = (data || []).filter((g) => g.warga_aktif > 0 || g.tulisan_terbit > 0 || g.pertanyaan_terjawab > 0)
+    .map((g) => ({ ...g, persen: g.warga_aktif ? Math.round((g.hadir / g.warga_aktif) * 100) : 0 }))
+    .sort((a, b) => b.persen - a.persen || (b.tulisan_terbit + b.pertanyaan_terjawab) - (a.tulisan_terbit + a.pertanyaan_terjawab) || a.ranting.localeCompare(b.ranting, 'id'));
+  let semua = false;
+  const gambar = () => {
+    const tampil = semua ? baris : baris.slice(0, 5);
+    kotak.innerHTML = `
+      <div class="baris-judul"><h2>Keaktifan Ranting</h2>${baris.length > 5 ? `<button type="button" class="tautan-hijau tautan-tombol" id="lihat-aktif">${semua ? 'Ringkas' : `Lihat ${baris.length} ranting`}</button>` : ''}</div>
+      <p class="kosong">${esc(bulan)} · persen warga yang hadir rutinan, jumlah tulisan terbit, dan pertanyaan warga ranting yang sudah dijawab.</p>
+      ${baris.length ? tampil.map((g) => `
+        <div class="aktif-baris">
+          <div class="batang"><span>${esc(g.ranting)}</span><i style="--w:${g.persen}%"></i><b>${g.persen}%</b></div>
+          <small>Hadir ${g.hadir} dari ${g.warga_aktif} warga · Tulisan ${g.tulisan_terbit} · Pertanyaan terjawab ${g.pertanyaan_terjawab}</small>
+        </div>`).join('') : '<p class="kosong">Belum ada data bulan ini.</p>'}
+      <p class="kosong">Angka ini hanya terlihat pengurus, untuk bahan pembinaan, bukan untuk dibandingkan di depan umum.</p>`;
+    kotak.querySelector('#lihat-aktif')?.addEventListener('click', () => { semua = !semua; gambar(); });
+  };
+  gambar();
+}
+
+function pasangCadangan(kotak) {
+  if (!kotak) return;
+  kotak.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-ekspor]'); if (!b) return;
+    const g = kotak.querySelector('#galat-ekspor'); g.hidden = true;
+    const awal = b.textContent; b.disabled = true; b.textContent = 'Menyiapkan…';
+    try { const [nama, baris] = await EKSPOR[b.dataset.ekspor].jalankan(); unduhCsv(nama, baris); }
+    catch (err) { g.textContent = 'Belum bisa menyiapkan berkas: ' + pesanGalat(err); g.hidden = false; }
+    b.disabled = false; b.textContent = awal;
+  });
 }

@@ -1,7 +1,7 @@
 // Service worker LBM MWCNU Tlanakan.
 // Menyimpan kerangka situs supaya terbuka cepat dan tetap menampilkan halaman saat sinyal hilang.
 // Data (jawaban, kas, absen) tidak pernah disimpan di sini; selalu diambil dari server.
-const VERSI = 'lbm-v11';
+const VERSI = 'lbm-v12';
 const KERANGKA = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const KERANGKA = [
   './js/lib/supa.js',
   './js/lib/util.js',
   './js/lib/pasang.js',
+  './js/lib/csv.js',
   './js/lib/data.js',
   './js/views/beranda.js',
   './js/views/masuk.js',
