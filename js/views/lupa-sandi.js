@@ -12,7 +12,7 @@ export function tampil(el, ctx) {
     <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:rgba(255,255,255,.9)">Masukkan nomor WhatsApp dan kode pemulihan 12 huruf yang Anda simpan.</p>
 
     <form class="kaca form" id="f" style="margin-top:20px" novalidate>
-      <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxxxx" required></div>
+      <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xx, 628xx, atau +62 8xx" required></div>
       <div class="kolom"><label for="kode">Kode pemulihan</label><input id="kode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX" required></div>
       <div class="kolom"><label for="baru">Kata sandi baru</label><input id="baru" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" required></div>
       <div class="kolom"><label for="ulang">Ulangi kata sandi baru</label><input id="ulang" type="password" autocomplete="new-password" required></div>
@@ -38,7 +38,7 @@ export function tampil(el, ctx) {
     if (!ctx.siap) return galat('Situs belum dihubungkan ke database. ' + ctx.alasanBelumSiap);
     const wa = normalisasiWa(f.wa.value);
     const kode = f.kode.value.replace(/[^A-Za-z0-9]/g, '');
-    if (!wa) return galat('Nomor WhatsApp tidak valid. Contoh: 081234567890.');
+    if (!wa) return galat('Nomor WhatsApp tidak valid. Boleh ditulis 08xx, 628xx, atau +62 8xx.');
     if (kode.length !== 12) return galat('Kode pemulihan terdiri dari 12 huruf dan angka.');
     if (f.baru.value.length < 8) return galat('Kata sandi minimal 8 karakter.');
     if (f.baru.value !== f.ulang.value) return galat('Kedua kata sandi tidak sama.');

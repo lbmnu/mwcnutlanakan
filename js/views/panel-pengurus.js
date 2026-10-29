@@ -3,7 +3,7 @@ import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
 import { bisaSetujui, bisaKas, adalahPenyunting } from '../state.js';
-import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda } from '../lib/util.js';
+import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda, normalisasiWa, kunciWa } from '../lib/util.js';
 import { sesiAktif, judulSesi } from '../lib/absen.js';
 import { EKSPOR, unduhCsv } from '../lib/csv.js';
 
@@ -36,8 +36,8 @@ export function tampil(el, ctx) {
       </section>
       ${setujui ? `
       <section class="bagian" id="bantu-sandi">
-        <h2>Bantu Warga Lupa Sandi</h2>
-        <p class="kosong">Untuk warga yang lupa sandi dan belum punya kode pemulihan. Cari namanya, lalu buat kata sandi sementara dan kirim lewat WA.</p>
+        <h2>Bantu Warga: Sandi dan Nomor</h2>
+        <p class="kosong">Cari namanya. Untuk yang lupa sandi dan belum punya kode pemulihan, buat kata sandi sementara. Untuk yang salah menulis nomor WA saat mendaftar, ganti nomornya (kata sandi tetap).</p>
         <div class="kolom" style="margin-top:10px"><label for="cari-warga" class="judul-kolom">Cari nama atau nomor WA</label><input id="cari-warga" type="text" autocomplete="off" placeholder="Ketik minimal 2 huruf"></div>
         <div id="hasil-cari"></div>
       </section>` : ''}
@@ -291,16 +291,18 @@ async function bantuSandi(kotak, saya) {
     const data = await muat();
     if (saya_ !== nomor) return;
     if (!data) { hasil.innerHTML = '<p class="galat">Daftar warga belum bisa dimuat.</p>'; return; }
-    const cocok = data.filter((x) => x.nama.toLowerCase().includes(q) || x.wa.includes(q.replace(/^0/, '62'))).slice(0, 6);
+    const cocok = data.filter((x) => x.nama.toLowerCase().includes(q) || (kunciWa(q).length >= 5 && x.wa.includes(kunciWa(q)))).slice(0, 6);
     if (!cocok.length) { hasil.innerHTML = '<p class="kosong">Tidak ada akun aktif yang cocok.</p>'; return; }
     hasil.innerHTML = cocok.map((x) => `
       <div class="baris" data-id="${esc(x.id)}" data-nama="${esc(x.nama)}" data-wa="${esc(x.wa)}">
         <div class="teks"><strong>${esc(x.nama)}</strong><small>${x.ranting?.nama ? 'Ranting NU ' + esc(x.ranting.nama) + ' · ' : ''}+${esc(x.wa)}</small></div>
-        <div class="aksi"><button type="button" class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" data-setel>Setel ulang</button></div>
+        <div class="aksi"><button type="button" class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" data-setel>Setel ulang</button><button type="button" class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" data-ganti>Ganti nomor</button></div>
       </div>`).join('');
   });
 
   hasil.addEventListener('click', async (e) => {
+    const g = e.target.closest('[data-ganti]');
+    if (g) { bukaFormNomor(g.closest('.baris')); return; }
     const b = e.target.closest('[data-setel]');
     if (!b) return;
     const baris = b.closest('.baris');
@@ -316,6 +318,36 @@ async function bantuSandi(kotak, saya) {
         <small>Tampil sekali ini saja. Kirim lewat WA pribadi, bukan grup.</small></div>
       <div class="aksi"><a class="tombol tombol-hijau tombol-kecil" href="https://wa.me/${esc(wa)}?text=${encodeURIComponent(pesan)}">${ikon('wa')} Kirim WA</a></div>`;
   });
+  // Form ganti nomor WA (di dalam baris hasil pencarian).
+  function bukaFormNomor(baris) {
+    const { id, nama, wa } = baris.dataset;
+    const asli = baris.innerHTML;
+    baris.innerHTML = `
+      <div class="teks" style="flex:1;min-width:0"><strong>Ganti nomor ${esc(nama)}</strong>
+        <small>Nomor sekarang: +${esc(wa)}. Kata sandinya tidak berubah; ia masuk dengan nomor baru.</small>
+        <div class="kolom" style="margin-top:8px"><label class="judul-kolom" for="nomor-baru">Nomor WA yang benar</label><input id="nomor-baru" type="tel" inputmode="tel" autocomplete="off" placeholder="08xx, 628xx, atau +62 8xx"></div>
+        <p class="galat" data-galat hidden></p>
+        <div class="dua-tombol" style="margin-top:8px"><button type="button" class="tombol tombol-hijau tombol-kecil" data-simpan>Simpan</button><button type="button" class="tombol tombol-garis tombol-kecil" style="color:var(--hijau-tengah)" data-batal>Batal</button></div>
+      </div>`;
+    const kolom = baris.querySelector('#nomor-baru'); const galat = baris.querySelector('[data-galat]'); kolom.focus();
+    const tampilGalat = (t) => { galat.textContent = t; galat.hidden = !t; };
+    baris.querySelector('[data-batal]').addEventListener('click', () => { baris.innerHTML = asli; });
+    baris.querySelector('[data-simpan]').addEventListener('click', async (ev) => {
+      const baru = normalisasiWa(kolom.value);
+      if (!baru || !baru.startsWith('628')) { tampilGalat('Tulis nomor seluler yang benar, mis. 0852 3654 8383 (bukan NIK).'); return; }
+      if (baru === wa) { tampilGalat('Nomor baru sama dengan nomor lama.'); return; }
+      if (!confirm(`Ganti nomor ${nama} dari +${wa} menjadi +${baru}?`)) return;
+      ev.target.disabled = true; tampilGalat('');
+      const { data, error } = await supa.rpc('ganti_nomor_warga', { p_id: id, p_wa: baru });
+      if (error || !data) { ev.target.disabled = false; tampilGalat(error ? pesanGalat(error) : 'Belum berhasil. Coba lagi.'); return; }
+      if (semua) { const x = semua.find((y) => y.id === id); if (x) x.wa = data; }
+      const pesan = `Assalamu’alaikum Wr. Wb. Bapak/Ibu ${nama}, nomor untuk masuk ke website LBM MWCNU Tlanakan sudah kami perbarui menjadi ${data}. Kata sandi Anda tetap. Silakan masuk dengan nomor ini. Wassalamu’alaikum Wr. Wb.`;
+      baris.dataset.wa = data;
+      baris.innerHTML = `
+        <div class="teks"><strong>Nomor ${esc(nama)} sudah diganti</strong><small>Sekarang: +${esc(data)}. Kabari yang bersangkutan agar masuk dengan nomor baru.</small></div>
+        <div class="aksi"><a class="tombol tombol-hijau tombol-kecil" href="https://wa.me/${esc(data)}?text=${encodeURIComponent(pesan)}">${ikon('wa')} Kabari</a></div>`;
+    });
+  }
 }
 
 // Kartu kas di Panel: saldo dan arus bulan ini; rinciannya ada di menu Kas.

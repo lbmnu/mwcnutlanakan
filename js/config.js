@@ -11,7 +11,7 @@ export const DOMAIN_AKUN = 'akun.lbm-tlanakan.id';
 // Kontak WA untuk tombol "Kabari Pengurus" (format 62..., tanpa + dan tanpa spasi).
 // Langsung ke Ketua dan Wakil Ketua. Mengganti nomor cukup mengubah di sini.
 export const KONTAK_PENGURUS = [
-  { peran: 'Ketua', nama: 'Ust. Syaifuddin', wa: '6285236548383' },
+  { peran: 'Ketua', nama: 'Ust. Syaifuddin', wa: '6285960373957' },
   { peran: 'Wakil Ketua', nama: 'Ust. Subhan', wa: '6282336144472' }
 ];
 

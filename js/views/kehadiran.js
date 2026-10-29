@@ -1,7 +1,7 @@
 import { supa } from '../lib/supa.js';
 import { layar } from '../lib/kerangka.js';
 import { bisaSetujui, adalahPengurus } from '../state.js';
-import { esc } from '../lib/util.js';
+import { esc, kunciWa } from '../lib/util.js';
 import { sesiAktif, judulSesi, ambilKartu } from '../lib/absen.js';
 import { bisaPindai, bukaPemindai } from '../lib/pindai.js';
 
@@ -91,7 +91,7 @@ export async function tampil(el, ctx) {
       const gambar = () => {
         const q = cari.value.trim().toLowerCase().replace(/^\+/, '');
         if (q.length < 2) { hasil.innerHTML = ''; return; }
-        const cocok = warga.filter((x) => x.nama.toLowerCase().includes(q) || x.wa.includes(q.replace(/^0/, '62'))).slice(0, 8);
+        const cocok = warga.filter((x) => x.nama.toLowerCase().includes(q) || (kunciWa(q).length >= 5 && x.wa.includes(kunciWa(q)))).slice(0, 8);
         hasil.innerHTML = cocok.length ? cocok.map((x) => `
           <div class="baris" data-id="${esc(x.id)}">
             <div class="teks"><strong>${esc(x.nama)}</strong><small>${x.ranting?.nama ? 'Ranting NU ' + esc(x.ranting.nama) : ''}</small></div>

@@ -12,7 +12,7 @@ export function tampil(el, ctx) {
     <p style="margin:8px 0 0;font-size:14px;line-height:1.5;color:rgba(255,255,255,.9)">Silakan masuk menggunakan nomor WhatsApp yang telah terverifikasi.</p>
 
     <form class="kaca form" id="f" style="margin-top:20px" novalidate>
-      <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" name="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxxxx" required></div>
+      <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" name="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xx, 628xx, atau +62 8xx" required></div>
       <div class="kolom"><label for="sandi">Kata sandi</label><input id="sandi" name="sandi" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required></div>
       <p style="margin:0;font-size:13px;font-weight:600"><a class="tautan-emas" href="#/lupa-sandi" style="min-height:0">Lupa kata sandi?</a></p>
       <p id="pesan" class="galat" role="alert" hidden></p>
@@ -40,7 +40,7 @@ export function tampil(el, ctx) {
     tampilkanGalat('');
     if (!ctx.siap) return tampilkanGalat('Situs belum dihubungkan ke database. ' + ctx.alasanBelumSiap);
     const wa = normalisasiWa(f.wa.value);
-    if (!wa) return tampilkanGalat('Nomor WhatsApp tidak valid. Contoh: 081234567890.');
+    if (!wa) return tampilkanGalat('Nomor WhatsApp tidak valid. Boleh ditulis 08xx, 628xx, atau +62 8xx.');
     if (!f.sandi.value) return tampilkanGalat('Kata sandi belum diisi.');
     tombol.disabled = true; tombol.textContent = 'Memeriksa…';
     const { error } = await supa.auth.signInWithPassword({ email: emailDariWa(wa), password: f.sandi.value });

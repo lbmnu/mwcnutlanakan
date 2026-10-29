@@ -1,12 +1,20 @@
 import { DOMAIN_AKUN } from '../config.js';
 
-// Mengubah penulisan nomor apa pun menjadi format 62xxxxxxxxxx. Mengembalikan null bila tidak masuk akal.
-export function normalisasiWa(masukan) {
+// Ubah penulisan nomor apa pun menjadi digit berformat 62xxxxxxxxxx (tanpa memeriksa panjang).
+// Diterima: 08xx, 8xx, 628xx, +62 8xx, +62 (0)8xx, 0062 8xx, dengan spasi/strip/titik/kurung.
+export function kunciWa(masukan) {
   let d = String(masukan || '').replace(/\D/g, '');
-  if (d.startsWith('0')) d = '62' + d.slice(1);
+  if (d.startsWith('00')) d = d.slice(2);
+  if (d.startsWith('62')) d = '62' + d.slice(2).replace(/^0+/, '');
+  else if (d.startsWith('0')) d = '62' + d.replace(/^0+/, '');
   else if (d.startsWith('8')) d = '62' + d;
-  if (!/^62\d{8,13}$/.test(d)) return null;
   return d;
+}
+
+// Nomor lengkap yang valid, atau null bila tidak masuk akal (mis. NIK, nomor terlalu pendek).
+export function normalisasiWa(masukan) {
+  const d = kunciWa(masukan);
+  return /^62\d{8,13}$/.test(d) ? d : null;
 }
 
 export const emailDariWa = (wa) => `${wa}@${DOMAIN_AKUN}`;
@@ -16,7 +24,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib|Alasan penolakan|Jawaban tidak ditemukan|Tulisan sudah ditolak|Tulisan masih terbit/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib|Alasan penolakan|Jawaban tidak ditemukan|Tulisan sudah ditolak|Tulisan masih terbit|Nomor WA tidak valid|Nomor ini sudah dipakai|Nomor akun sendiri|Nomor baru sama/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');

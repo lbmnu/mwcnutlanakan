@@ -20,8 +20,8 @@ export async function tampil(el, ctx) {
           </div>
           <p class="petunjuk">Hanya keterangan, tidak mengubah hak akses. Akun pengurus LBM dibuatkan oleh admin.</p>
         </div>
-        <div class="kolom"><label for="nama">Nama lengkap</label><input id="nama" name="nama" type="text" autocomplete="name" placeholder="Nama sesuai KTP" required></div>
-        <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" name="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xxxxxxxxxx" required></div>
+        <div class="kolom"><label for="nama">Nama lengkap</label><input id="nama" name="nama" type="text" autocomplete="name" placeholder="Contoh: Ahmad Fauzi (nama, bukan nomor KTP)" required></div>
+        <div class="kolom"><label for="wa">Nomor WhatsApp</label><input id="wa" name="wa" type="tel" inputmode="tel" autocomplete="username" placeholder="08xx, 628xx, atau +62 8xx" required></div>
         <div class="kolom"><label for="ranting">Ranting NU</label><select id="ranting" name="ranting" required><option value="">Pilih ranting</option></select></div>
         <div id="tambahan" hidden class="form">
           <div class="kolom"><label for="lembaga">Lembaga, banom, atau ranting</label>
@@ -68,7 +68,8 @@ export async function tampil(el, ctx) {
     const nama = f.nama.value.trim().replace(/\s+/g, ' ');
     const wa = normalisasiWa(f.wa.value);
     if (nama.length < 2) return tampilkanGalat('Nama lengkap belum diisi.');
-    if (!wa) return tampilkanGalat('Nomor WhatsApp tidak valid. Contoh: 081234567890.');
+    if (!/\p{L}/u.test(nama) || /^[\d\s.\-]+$/.test(nama)) return tampilkanGalat('Tulis nama lengkap dengan huruf, bukan nomor (NIK/KTP).');
+    if (!wa) return tampilkanGalat('Nomor WhatsApp tidak valid. Boleh ditulis 08xx, 628xx, atau +62 8xx.');
     if (!f.ranting.value) return tampilkanGalat('Ranting NU belum dipilih.');
     if (tipe === 'pengurus_struktural' && (!f.lembaga.value || !f.jabatan.value.trim())) return tampilkanGalat('Lengkapi kepengurusan dan jabatan Anda.');
     if (f.sandi.value.length < 8) return tampilkanGalat('Kata sandi minimal 8 karakter.');
