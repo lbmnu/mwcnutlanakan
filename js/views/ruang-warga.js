@@ -31,6 +31,16 @@ export function tampil(el, ctx) {
       <section class="bagian">
         <div class="kartu-tulisan">
           <div>
+            <h2>Arsip Rutinan</h2>
+            <p class="kosong">Foto dan catatan rutinan bulanan LBM, khusus warga yang sudah masuk.</p>
+          </div>
+          ${ubin('dokumen')}
+        </div>
+        <div class="dua-tombol" style="margin-top:12px"><a class="tombol tombol-garis" href="#/arsip" style="color:var(--hijau-tengah)">Buka Arsip</a></div>
+      </section>
+      <section class="bagian">
+        <div class="kartu-tulisan">
+          <div>
             <h2>Kirim Tulisan</h2>
             <p class="kosong">Khotbah Jumat, artikel turats, atau esai ke-NU-an. Naskah disunting Tim Penyunting sebelum terbit, dan nama Anda dicantumkan sebagai penulis.</p>
           </div>

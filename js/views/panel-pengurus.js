@@ -29,6 +29,12 @@ export function tampil(el, ctx) {
       </div>
       <section class="bagian" id="sesi-absen"><p class="kosong">Memuat…</p></section>
       ${adalahPenyunting(p) ? '<section class="bagian" id="antrean-tulisan"><p class="kosong">Memuat…</p></section>' : ''}
+      ${setujui ? `
+      <section class="bagian">
+        <div class="baris-judul"><h2>Arsip Rutinan</h2><a class="tautan-hijau" href="#/arsip">Buka arsip</a></div>
+        <p class="kosong">Setelah rutinan selesai, simpan foto dan ringkasannya di sini.</p>
+        <a class="tombol tombol-hijau" href="#/panel/arsip" style="margin-top:10px">Tambah Arsip Rutinan</a>
+      </section>` : ''}
       <section class="bagian" id="kas-ringkas"><p class="kosong">Memuat…</p></section>
       <section class="bagian">
         <div class="baris-judul"><h2>Menunggu Persetujuan</h2><span class="tag" id="lencana-menunggu">…</span></div>
