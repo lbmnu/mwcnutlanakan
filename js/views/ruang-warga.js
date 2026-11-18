@@ -5,6 +5,7 @@ import { esc, tanggalId, JENIS } from '../lib/util.js';
 import { jawabanTerbaru, tulisanTerbaru } from '../lib/data.js';
 import { pasangKartuAbsen } from '../lib/kartu-absen.js';
 import { pasangRingHadir } from '../lib/ring-hadir.js';
+import { pasangBannerAgenda } from '../lib/agenda-banner.js';
 
 // Beranda untuk warga (dan untuk pengurus lewat menu "Beranda").
 export function tampil(el, ctx) {
@@ -16,6 +17,7 @@ export function tampil(el, ctx) {
     isi: `
       <div id="pasang"></div>
       <div id="ajakan-kode"></div>
+      <section class="bagian" id="agenda-warga"><p class="kosong">Memuat…</p></section>
       <section class="bagian kartu-ring" id="ring-hadir" aria-label="Kehadiran rutinan"><p class="kosong">Memuat…</p></section>
       <section class="bagian kartu-gelap" id="terbaru"><p class="kosong">Memuat…</p></section>
       <section class="bagian" id="kartu-absen"></section>
@@ -27,16 +29,6 @@ export function tampil(el, ctx) {
           <a class="tombol tombol-hijau" href="#/tanya">Tulis Pertanyaan</a>
           <a class="tombol tombol-garis" href="#/profil" style="color:var(--hijau-tengah)">Riwayat Tanya</a>
         </div>
-      </section>
-      <section class="bagian">
-        <div class="kartu-tulisan">
-          <div>
-            <h2>Arsip Rutinan</h2>
-            <p class="kosong">Foto dan catatan rutinan bulanan LBM, khusus warga yang sudah masuk.</p>
-          </div>
-          ${ubin('dokumen')}
-        </div>
-        <div class="dua-tombol" style="margin-top:12px"><a class="tombol tombol-garis" href="#/arsip" style="color:var(--hijau-tengah)">Buka Arsip</a></div>
       </section>
       <section class="bagian">
         <div class="kartu-tulisan">
@@ -54,6 +46,7 @@ export function tampil(el, ctx) {
   });
   const bersihPasang = pasangKartu(isi.querySelector('#pasang'));
   ajakanKode(isi.querySelector('#ajakan-kode'));
+  pasangBannerAgenda(isi.querySelector('#agenda-warga'));
   muatTerbaru(isi.querySelector('#terbaru'));
   muatTulisanTerbaru(isi.querySelector('#tulisan-terbaru'));
   const ring = () => pasangRingHadir(isi.querySelector('#ring-hadir'));

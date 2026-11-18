@@ -375,7 +375,7 @@ button { cursor: pointer; }
 /* ---------- Kas (tahap 4) ---------- */
 .form-kas { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
 .form-kas[hidden] { display: none; }
-.form-kas .kolom input[type=date] { min-height: 48px; border-radius: 14px; border: 1px solid #B9CFC2; background: var(--putih); color: var(--teks); padding: 0 14px; font: inherit; }
+.form .kolom input[type=date], .form-kas .kolom input[type=date] { min-height: 48px; border-radius: 14px; border: 1px solid #B9CFC2; background: var(--putih); color: var(--teks); padding: 0 14px; font: inherit; }
 .petunjuk-kas { font-size: 12px; line-height: 1.5; color: var(--teks-redam); margin: 0; }
 .transaksi.batal { opacity: .6; }
 .transaksi.batal b { text-decoration: line-through; }
@@ -419,17 +419,16 @@ button { cursor: pointer; }
 .aktif-baris .batang b { width: 40px; }
 .aktif-baris small { display: block; font-size: 12px; line-height: 1.4; color: var(--teks-redam); padding-left: 120px; }
 
-/* arsip rutinan */
-.kartu-arsip { flex-direction: row; align-items: center; gap: 12px; }
-.kartu-arsip .foto-kecil { flex: none; width: 64px; height: 64px; border-radius: 14px; background: var(--sage) center / cover no-repeat; }
-.kartu-arsip .isi-arsip { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.kartu-arsip .isi-arsip strong { font-size: 15px; line-height: 1.35; }
-.kisi-foto { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.kotak-foto { position: relative; display: block; aspect-ratio: 1; padding: 0; border: 1px solid var(--garis); border-radius: 14px; overflow: hidden; background: var(--sage); cursor: pointer; }
-.kotak-foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.hapus-foto { position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(18, 38, 29, .78); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
-.sembunyi-berkas { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.lihat-foto { position: fixed; inset: 0; z-index: 20; background: rgba(8, 20, 14, .94); display: grid; place-items: center; padding: 16px; }
-.lihat-foto[hidden] { display: none; }
-.lihat-foto img { max-width: 100%; max-height: 100%; border-radius: 12px; }
-.tutup-foto { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 12px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .16); color: #fff; font-size: 28px; line-height: 1; cursor: pointer; }
+/* ---------- Agenda rutinan ---------- */
+.info-acara { margin: 10px 0 0; display: grid; gap: 10px; }
+.info-acara div { display: grid; gap: 2px; }
+.info-acara dt { font-size: 12px; font-weight: 700; color: var(--teks-redam); letter-spacing: .02em; }
+.info-acara dd { margin: 0; font-size: 15px; line-height: 1.5; }
+.soal { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 12px; }
+.soal li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; line-height: 1.65; }
+.huruf { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--sage); color: #1B3A2C; font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.butir-baris { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; }
+.butir-baris:first-child { margin-top: 0; }
+.butir-baris textarea { flex: 1; min-width: 0; }
+.butir-baris .huruf { margin-top: 10px; }
+.butir-baris .tombol { flex: none; width: 44px; min-height: 44px; padding: 0; }

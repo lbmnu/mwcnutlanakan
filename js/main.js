@@ -26,9 +26,9 @@ import * as tulisanDaftar from './views/tulisan-daftar.js';
 import * as tulisanBaca from './views/tulisan-baca.js';
 import * as panelTulisan from './views/panel-tulisan.js';
 import * as panelSunting from './views/panel-sunting.js';
-import * as arsip from './views/arsip.js';
-import * as arsipBaca from './views/arsip-baca.js';
-import * as arsipSunting from './views/arsip-sunting.js';
+import * as agenda from './views/agenda.js';
+import * as agendaBaca from './views/agenda-baca.js';
+import * as panelAgenda from './views/panel-agenda.js';
 import { pasangLihatSandi } from './lib/lihat-sandi.js';
 
 const app = document.getElementById('app');
@@ -47,6 +47,8 @@ const daftarRute = [
   { pola: new RegExp(`^/jawaban/${UUID}$`), modul: jawabanBaca, jenis: 'bebas' },
   { pola: /^\/tulisan$/, modul: tulisanDaftar, jenis: 'bebas' },
   { pola: new RegExp(`^/tulisan/${UUID}$`), modul: tulisanBaca, jenis: 'bebas' },
+  { pola: /^\/agenda$/, modul: agenda, jenis: 'bebas' },
+  { pola: new RegExp(`^/agenda/${UUID}$`), modul: agendaBaca, jenis: 'bebas' },
   { pola: /^\/menunggu$/, modul: menunggu, jenis: 'khusus' },
   { pola: /^\/ganti-sandi$/, modul: gantisandi, jenis: 'khusus' },
   { pola: /^\/dasbor$/, modul: dasbor, jenis: 'dalam' },
@@ -61,14 +63,11 @@ const daftarRute = [
   { pola: /^\/tanya$/, modul: tanya, jenis: 'dalam' },
   { pola: /^\/tulis$/, modul: tulis, jenis: 'dalam' },
   { pola: /^\/tulisan-saya$/, modul: tulisanSaya, jenis: 'dalam' },
-  { pola: /^\/arsip$/, modul: arsip, jenis: 'dalam' },
-  { pola: new RegExp(`^/arsip/${UUID}$`), modul: arsipBaca, jenis: 'dalam' },
-  { pola: /^\/panel\/arsip$/, modul: arsipSunting, jenis: 'dalam' },
-  { pola: new RegExp(`^/panel/arsip/${UUID}$`), modul: arsipSunting, jenis: 'dalam' },
   { pola: /^\/panel\/tulisan$/, modul: panelTulisan, jenis: 'dalam' },
   { pola: new RegExp(`^/panel/tulisan/${UUID}$`), modul: panelSunting, jenis: 'dalam' },
   { pola: /^\/panel$/, modul: panelPertanyaan, jenis: 'dalam' },
-  { pola: new RegExp(`^/panel/jawab/${UUID}$`), modul: panelJawab, jenis: 'dalam' }
+  { pola: new RegExp(`^/panel/jawab/${UUID}$`), modul: panelJawab, jenis: 'dalam' },
+  { pola: /^\/panel\/agenda$/, modul: panelAgenda, jenis: 'dalam' }
 ];
 
 let bersihkan = null;

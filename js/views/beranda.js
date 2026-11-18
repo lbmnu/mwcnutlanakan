@@ -1,6 +1,7 @@
 import { pasangKartu } from '../lib/pasang.js';
 import { esc, ikon } from '../lib/util.js';
-import { jawabanTerbaru } from '../lib/data.js';
+import { jawabanTerbaru, agendaTerdekat } from '../lib/data.js';
+import { hariTanggal } from '../lib/util.js';
 
 export function tampil(el, ctx) {
   el.innerHTML = `
@@ -19,11 +20,17 @@ export function tampil(el, ctx) {
       <p class="teks-kecil-terang">Belum memiliki akun? Silakan <a class="tautan-emas" href="#/daftar">mendaftar</a>, lalu tunggu verifikasi pengurus.</p>
     </section>
     ${ctx.siap ? '' : `<p class="galat" style="margin-top:16px">Mode pratinjau: ${ctx.alasanBelumSiap}</p>`}
+    <div id="agenda-beranda" style="margin-top:16px"></div>
     <div id="terbaru-beranda" style="margin-top:16px"></div>
     <div id="pasang" style="margin-top:16px"></div>
     <div class="pegas"></div>
   </main>`;
   if (ctx.siap) {
+    agendaTerdekat(1).then(([a]) => {
+      const k = el.querySelector('#agenda-beranda');
+      if (!k || !a) return;
+      k.innerHTML = `<a class="pasang banner-jawaban" href="#/agenda/${esc(a.id)}"><p><small>Agenda rutinan · ${esc(hariTanggal(a.tanggal, true))}</small><strong>${esc(a.judul)}</strong></p>${ikon('panah')}</a>`;
+    });
     jawabanTerbaru(1).then(([j]) => {
       const k = el.querySelector('#terbaru-beranda');
       if (!k) return;

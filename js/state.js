@@ -27,6 +27,10 @@ export const adalahAdmin = (p) => !!p && p.status === 'aktif' && p.peran === 'ad
 export const bisaSetujui = (p) =>
   !!p && p.status === 'aktif' && (p.peran === 'admin' || ['ketua', 'wakil_ketua', 'sekretaris'].includes(p.jabatan_lbm));
 
+// Mengelola agenda rutinan: Ketua, Wakil Ketua, Sekretaris, admin, atau Tim Penjawab (sama dengan bisa_agenda di database).
+export const bisaAgenda = (p) =>
+  !!p && p.status === 'aktif' && (p.peran === 'admin' || p.tim_penjawab === true || ['ketua', 'wakil_ketua', 'sekretaris'].includes(p.jabatan_lbm));
+
 export const labelPeran = (p) => {
   if (!p) return '';
   if (p.peran === 'admin') return 'Admin';

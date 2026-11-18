@@ -24,7 +24,7 @@ export function esc(teks) {
 }
 
 // Pesan dari fungsi database sudah berbahasa Indonesia dan aman ditampilkan apa adanya.
-const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib|Alasan penolakan|Jawaban tidak ditemukan|Tulisan sudah ditolak|Tulisan masih terbit|Nomor WA tidak valid|Nomor ini sudah dipakai|Nomor akun sendiri|Nomor baru sama|Judul arsip|Sesi absen|Lokasi foto|Foto terlalu|Maksimal 6 foto|Arsip tidak|Foto tidak|Nama harus/;
+const PESAN_SERVER = /Pertanyaan terlalu|Masih ada 5 pertanyaan|Batas kiriman harian|Akun belum aktif|Menunggu tinjauan|Simpan draf jawaban|wajib diisi|Peninjau harus|Pilih anggota Tim|Jawaban sudah terbit|Tidak berwenang|Sesi tidak sedang dibuka|Pertanyaan tidak ditemukan|Kata sandi minimal 8 karakter|Gunakan menu Profil|Akun tidak ditemukan|Nominal tidak valid|Tanggal tidak valid|Kategori tidak sesuai|Keterangan wajib|Alasan pembatalan|Catatan tidak ditemukan|Judul terlalu|Isi tulisan terlalu|Bentuk tulisan wajib|Masih ada 3 tulisan|Tulisan tidak|Tulisan sudah terbit|Tulisan sedang|Menunggu persetujuan penulis|Suntingan yang menyentuh|Catatan wajib|Alasan penolakan|Jawaban tidak ditemukan|Tulisan sudah ditolak|Tulisan masih terbit|Nomor WA tidak valid|Nomor ini sudah dipakai|Nomor akun sendiri|Nomor baru sama|Tanggal acara|Terlalu banyak butir|Deskripsi masalah terlalu|Agenda tidak ditemukan|Lengkapi tempat|Agenda masih terbit|Status tidak valid/;
 
 export function pesanGalat(err) {
   const asli = String(err?.message || err || '');
@@ -119,4 +119,21 @@ export const tautanTulisan = (id) => `${location.origin}${location.pathname}#/tu
 export function teksBagikanTulisan(t) {
   const oleh = t.penulis ? ` karya ${t.penulis}` : '';
   return `Assalamu’alaikum Wr. Wb.\n\nAlhamdulillah, telah terbit tulisan${oleh} di website LBM MWCNU Tlanakan:\n\n${t.judul}\n\nSilakan simak selengkapnya melalui tautan berikut: ${tautanTulisan(t.id)}\n\nSemoga bermanfaat.\nWassalamu’alaikum Wr. Wb.`;
+}
+
+// ---------- Agenda rutinan ----------
+const HARI = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+// "2026-11-15" -> "Ahad, 15 November 2026" (dihitung dari teks tanggal, tidak bergantung zona waktu perangkat).
+export function hariTanggal(iso, singkat = false) {
+  const [t, b, h] = String(iso || '').split('-').map(Number);
+  if (!t || !b || !h) return '';
+  const hari = HARI[new Date(Date.UTC(t, b - 1, h)).getUTCDay()];
+  return `${hari}, ${h} ${singkat ? BULAN[b - 1].slice(0, 3) : BULAN[b - 1]} ${t}`;
+}
+export const hurufButir = (i) => `${String.fromCharCode(97 + (i % 26))}.`;
+export const tautanAgenda = (id) => `${location.origin}${location.pathname}#/agenda/${id}`;
+export function teksBagikanAgenda(a) {
+  const waktu = a.waktu ? `\nWaktu     : ${a.waktu}` : '';
+  const tanya = (a.pertanyaan || []).map((q, i) => `${hurufButir(i)} ${q}`).join('\n');
+  return `Assalamu’alaikum Wr. Wb.\n\nDengan hormat, kami mengundang Bapak/Ibu untuk hadir dalam acara Bahtsul Masail LBM MWCNU Tlanakan:\n\nHari/Tgl : ${hariTanggal(a.tanggal)}${a.hijriah ? ` / ${a.hijriah}` : ''}${waktu}\nTempat   : ${a.tempat}\n\nMasalah: ${a.judul}\n\nPertanyaan:\n${tanya}\n\nDeskripsi masalah selengkapnya: ${tautanAgenda(a.id)}\n\nAtas kehadirannya kami haturkan terima kasih.\nWassalamu’alaikum Wr. Wb.`;
 }

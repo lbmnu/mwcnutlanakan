@@ -2,8 +2,9 @@ import { supa } from '../lib/supa.js';
 import { pasangKartu } from '../lib/pasang.js';
 import { layar, segeraHadir } from '../lib/kerangka.js';
 import { ajakanKode } from '../lib/pemulihan.js';
-import { bisaSetujui, bisaKas, adalahPenyunting } from '../state.js';
-import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda, normalisasiWa, kunciWa } from '../lib/util.js';
+import { bisaSetujui, bisaKas, adalahPenyunting, bisaAgenda } from '../state.js';
+import { agendaTerdekat } from '../lib/data.js';
+import { esc, ikon, tanggalId, pesanGalat, rp, rpTanda, normalisasiWa, kunciWa, hariTanggal } from '../lib/util.js';
 import { sesiAktif, judulSesi } from '../lib/absen.js';
 import { EKSPOR, unduhCsv } from '../lib/csv.js';
 
@@ -27,14 +28,9 @@ export function tampil(el, ctx) {
         <div><b id="st-menunggu">…</b><small>Menunggu persetujuan</small></div>
         <div><b id="st-tanya">${tim ? '…' : '–'}</b><small>Pertanyaan belum dijawab</small></div>
       </div>
+      <section class="bagian" id="agenda-ringkas"><p class="kosong">Memuat…</p></section>
       <section class="bagian" id="sesi-absen"><p class="kosong">Memuat…</p></section>
       ${adalahPenyunting(p) ? '<section class="bagian" id="antrean-tulisan"><p class="kosong">Memuat…</p></section>' : ''}
-      ${setujui ? `
-      <section class="bagian">
-        <div class="baris-judul"><h2>Arsip Rutinan</h2><a class="tautan-hijau" href="#/arsip">Buka arsip</a></div>
-        <p class="kosong">Setelah rutinan selesai, simpan foto dan ringkasannya di sini.</p>
-        <a class="tombol tombol-hijau" href="#/panel/arsip" style="margin-top:10px">Tambah Arsip Rutinan</a>
-      </section>` : ''}
       <section class="bagian" id="kas-ringkas"><p class="kosong">Memuat…</p></section>
       <section class="bagian">
         <div class="baris-judul"><h2>Menunggu Persetujuan</h2><span class="tag" id="lencana-menunggu">…</span></div>
@@ -76,6 +72,7 @@ export function tampil(el, ctx) {
   const muatSemua = () => muatAngka(isi, tim);
   muatSemua();
   muatKasRingkas(isi, bisaKas(p));
+  muatAgendaRingkas(isi, bisaAgenda(p));
   if (adalahPenyunting(p)) muatAntreanTulisan(isi);
   if (setujui) muatMenunggu(isi.querySelector('#daftar-menunggu'), muatSemua);
   if (setujui) bantuSandi(isi.querySelector('#bantu-sandi'), p);
@@ -421,4 +418,25 @@ function pasangCadangan(kotak) {
     catch (err) { g.textContent = 'Belum bisa menyiapkan berkas: ' + pesanGalat(err); g.hidden = false; }
     b.disabled = false; b.textContent = awal;
   });
+}
+
+async function muatAgendaRingkas(isi, kelola) {
+  const k = isi.querySelector('#agenda-ringkas');
+  const [a, draf] = await Promise.all([
+    agendaTerdekat(1),
+    kelola ? supa.from('agenda_rutinan').select('id', { count: 'exact', head: true }).eq('status', 'draf').then((r) => (r.error ? null : r.count)) : Promise.resolve(null)
+  ]);
+  if (!k.isConnected) return;
+  const sisi = kelola
+    ? `<a class="tautan-hijau" href="#/panel/agenda">Kelola${draf ? ` (${draf} draf)` : ''}</a>`
+    : '<a class="tautan-hijau" href="#/agenda">Semua agenda</a>';
+  k.innerHTML = `
+    <div class="baris-judul"><h2>Agenda Rutinan</h2>${sisi}</div>
+    ${a
+      ? `<a class="kartu-tautan kartu-dalam" href="#/agenda/${esc(a.id)}">
+           <span class="tag-baris"><span class="tag">${esc(hariTanggal(a.tanggal, true))}</span>${a.hijriah ? `<span class="tag tag-garis">${esc(a.hijriah)}</span>` : ''}</span>
+           <strong>${esc(a.judul)}</strong><small>${esc(a.tempat)}</small>
+         </a>`
+      : '<p class="kosong">Belum ada acara yang diumumkan.</p>'}
+    ${kelola ? '<a class="tombol tombol-hijau tombol-kecil" style="margin-top:12px" href="#/panel/agenda">Tulis agenda atau draf soal</a>' : ''}`;
 }
